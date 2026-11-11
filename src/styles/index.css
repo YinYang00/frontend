@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Clasele comune ale aplicatiei, definite o singura data (CODING_STYLE 3.4).
+   Un buton foloseste "btn" plus varianta: "btn btn-primar". */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primar {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-600;
+  }
+
+  .btn-secundar {
+    @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-400;
+  }
+
+  .btn-pericol {
+    @apply bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600;
+  }
+
+  .camp {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/30 focus:outline-none aria-invalid:border-red-500;
+  }
+}
