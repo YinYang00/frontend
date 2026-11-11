@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import ConfirmDialog from '../../components/ConfirmDialog.jsx';
+import Icon from '../../components/Icon.jsx';
 import StatusMessage from '../../components/StatusMessage.jsx';
 import {
   useCreateFacilitate,
@@ -67,9 +68,9 @@ export default function FacilitatiPage() {
   return (
     <section className="flex flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Facilități</h1>
-          <p className="text-sm text-slate-600">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-normal text-heading">Facilități</h1>
+          <p className="text-sm text-muted">
             Terenurile și sălile care pot fi rezervate de studenți.
           </p>
         </div>
@@ -78,6 +79,7 @@ export default function FacilitatiPage() {
           className="btn btn-primar"
           onClick={() => openFormular(FORMULAR_NOU)}
         >
+          <Icon nume="plus" />
           Adaugă facilitate
         </button>
       </header>

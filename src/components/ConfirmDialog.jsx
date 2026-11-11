@@ -15,7 +15,7 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   return (
-    <div className="fixed inset-0 z-10 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center">
+    <div className="fixed inset-0 z-10 flex items-end justify-center bg-ink/40 p-4 sm:items-center">
       <div
         role="alertdialog"
         aria-modal="true"
@@ -23,10 +23,10 @@ export default function ConfirmDialog({
         aria-describedby="confirm-mesaj"
         className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"
       >
-        <h2 id="confirm-titlu" className="text-lg font-semibold text-slate-900">
+        <h2 id="confirm-titlu" className="text-lg font-semibold text-ink">
           {titlu}
         </h2>
-        <p id="confirm-mesaj" className="mt-2 text-sm text-slate-600">
+        <p id="confirm-mesaj" className="mt-2 text-sm text-muted">
           {mesaj}
         </p>
         <div className="mt-6 flex justify-end gap-3">

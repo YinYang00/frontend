@@ -92,7 +92,7 @@ export default function FacilitateForm({
     >
       {CAMPURI.map(({ name, label, type = 'text', placeholder }) => (
         <div key={name} className="flex flex-col gap-1">
-          <label htmlFor={name} className="text-sm font-medium text-slate-700">
+          <label htmlFor={name} className="text-sm font-medium text-ink">
             {label}
           </label>
           <input

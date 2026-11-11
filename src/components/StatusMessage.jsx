@@ -1,7 +1,7 @@
 const VARIANTE = {
   eroare: 'border-red-200 bg-red-50 text-red-800',
-  succes: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-  info: 'border-slate-200 bg-slate-50 text-slate-700',
+  succes: 'border-success/20 bg-success-soft text-success',
+  info: 'border-line bg-white text-muted',
 };
 
 /**

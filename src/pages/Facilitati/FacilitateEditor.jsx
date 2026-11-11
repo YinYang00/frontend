@@ -19,8 +19,8 @@ export default function FacilitateEditor({
   onCancel,
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">
+    <div className="flex flex-col gap-4 card p-5">
+      <h2 className="text-lg font-semibold text-ink">
         {facilitate ? `Editează ${facilitate.denumire}` : 'Facilitate nouă'}
       </h2>
       {salvare.isError && (

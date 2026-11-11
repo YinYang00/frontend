@@ -46,7 +46,7 @@ export default function FacilitatiList({ onEdit, onDelete }) {
   }
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {facilitati.map((facilitate) => (
         <FacilitateCard
           key={facilitate.id_facilitate}
