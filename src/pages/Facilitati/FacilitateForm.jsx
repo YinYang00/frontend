@@ -1,6 +1,27 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+/**
+ * Leaga o schema Zod de React Hook Form: intoarce datele validate sau prima
+ * eroare pentru fiecare camp. Inlocuieste pachetul `@hookform/resolvers`, ale
+ * carui dependente optionale fac package-lock.json invalid pentru npm ci.
+ * @param {z.ZodType} zodSchema
+ * @returns {import('react-hook-form').Resolver}
+ */
+function zodResolver(zodSchema) {
+  return (values) => {
+    const result = zodSchema.safeParse(values);
+    if (result.success) {
+      return { values: result.data, errors: {} };
+    }
+    const errors = {};
+    for (const issue of result.error.issues) {
+      const [camp] = issue.path;
+      errors[camp] ??= { type: issue.code, message: issue.message };
+    }
+    return { values: {}, errors };
+  };
+}
 
 // Aceleasi limite ca tabela facilitate si validarea din backend.
 const schema = z.object({
