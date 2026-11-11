@@ -105,14 +105,14 @@ O componentă care depășește limitele se împarte în componente mai mici (de
 
 ### 3.7 Comentarii
 
-- Tot ce este exportat (componente, hook-uri, funcții) are un comentariu **JSDoc**. La componente se documentează props-urile:
+- Tot ce este exportat (componente, hook-uri, funcții) are un comentariu **JSDoc**. La componente se documentează props-urile. Tipurile sunt precise: pentru funcții se scrie semnătura (`(date: object) => void`), nu `Function`, iar în loc de `any` se folosește `unknown`.
 
   ```jsx
   /**
    * Formularul de adaugare si editare a unei facilitati.
    * @param {object} props
    * @param {object} [props.facilitate] Facilitatea editata; lipseste la adaugare.
-   * @param {Function} props.onSubmit Primeste datele validate.
+   * @param {(date: object) => void} props.onSubmit Primeste datele validate.
    */
   export default function FacilitateForm({ facilitate, onSubmit }) {
   ```
