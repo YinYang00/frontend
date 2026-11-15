@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import AppFooter from './components/AppFooter.jsx';
 import AppHeader from './components/AppHeader.jsx';
 import FacilitatiPage from './pages/Facilitati/FacilitatiPage.jsx';
+import InregistrarePage from './pages/Inregistrare/InregistrarePage.jsx';
 
 /**
  * Componenta radacina: antetul, rutele aplicatiei si subsolul.
@@ -16,6 +17,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/facilitati" replace />} />
             <Route path="/facilitati" element={<FacilitatiPage />} />
+            <Route path="/inregistrare" element={<InregistrarePage />} />
           </Routes>
         </main>
         <AppFooter />

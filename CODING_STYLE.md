@@ -133,6 +133,7 @@ src/
     Facilitati/  FacilitatiPage.jsx si componentele folosite doar de pagina
   styles/        index.css cu Tailwind si clasele comune
   test/          configurarea testelor
+  utils/         functii ajutatoare fara React (zodResolver.js)
   App.jsx        rutele aplicatiei
   main.jsx       punctul de pornire
 ```
