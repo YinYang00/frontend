@@ -29,7 +29,7 @@ Utilizatorii de demo creați de `npm run setup` în backend:
 | Administrator | `admin.demo@usv.ro`           | `AdminDemo2026`   |
 | Student       | `student.demo@student.usv.ro` | `StudentDemo2026` |
 
-Interfața nu are încă pagină de autentificare (tichetul YT-56); până atunci utilizatorii de demo se autentifică direct prin API (`POST /api/v1/auth/login`). Un utilizator nou se înregistrează din pagina **Înregistrare** (`/inregistrare`).
+Utilizatorii de demo intră din butonul **Autentificare** din antet (`/autentificare`). Un utilizator nou se înregistrează din pagina **Înregistrare** (`/inregistrare`).
 
 ## Ce conține
 
