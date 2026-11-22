@@ -101,6 +101,17 @@ describe('AutentificarePage', () => {
     expect(loginUtilizator).not.toHaveBeenCalled();
   });
 
+  it('respinge un e-mail fara formatul unei adrese', async () => {
+    const user = renderAplicatia('/autentificare');
+
+    await autentifica(user, { email: 'ana.pop', parola: 'parola123' });
+
+    expect(
+      await screen.findByText('Adresa de e-mail nu are un format valid.'),
+    ).toBeInTheDocument();
+    expect(loginUtilizator).not.toHaveBeenCalled();
+  });
+
   it('din linkul din antet intoarce utilizatorul pe pagina curenta', async () => {
     vi.mocked(loginUtilizator).mockResolvedValue({
       token: 'abc.def.ghi',

@@ -7,8 +7,18 @@ import StatusMessage from '../../components/StatusMessage.jsx';
 import { useAutentificare } from '../../hooks/useAuth.js';
 import { zodResolver } from '../../utils/zodResolver.js';
 
+// Doar formatul adresei: daca e-mailul nu are cont, raspunsul serverului e
+// acelasi ca la parola gresita.
 const schema = z.object({
-  email: z.string().trim().toLowerCase().min(1, 'E-mailul este obligatoriu.'),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, 'E-mailul este obligatoriu.')
+    .regex(
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      'Adresa de e-mail nu are un format valid.',
+    ),
   parola: z.string().min(1, 'Parola este obligatorie.'),
 });
 
