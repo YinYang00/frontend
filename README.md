@@ -20,16 +20,16 @@ npm run build     # build de productie in dist/
 npm run preview   # serveste dist/ pe http://localhost:5173
 ```
 
-Backend-ul acceptă cereri doar de la `http://localhost:5173` (`CORS_ORIGIN` din `.env`-ul lui), de aceea atât `dev`, cât și `preview` pornesc pe acest port. Dacă portul e ocupat (de exemplu `dev` și `preview` pornite în același timp), comanda se oprește cu eroare în loc să treacă pe alt port. Dacă backend-ul rulează pe altă adresă, copiază `.env.example` în `.env.local` și schimbă `VITE_API_URL`, apoi repornește `npm run dev` sau refă `npm run build`.
+Backend-ul acceptă cereri doar de la `http://localhost:5173` (`CORS_ORIGIN` din `.env`-ul lui), de aceea atât `dev`, cât și `preview` pornesc pe acest port. Deschide aplicația la `localhost`, nu la `127.0.0.1`: pentru CORS sunt origini diferite. Dacă portul e ocupat (de exemplu `dev` și `preview` pornite în același timp), comanda se oprește cu eroare în loc să treacă pe alt port. Dacă backend-ul rulează pe altă adresă, copiază `.env.example` în `.env.local` și schimbă `VITE_API_URL`, apoi repornește `npm run dev` sau refă `npm run build`.
 
-Conturile de demo create de `npm run setup` în backend:
+Utilizatorii de demo creați de `npm run setup` în backend:
 
-| Cont          | E-mail                        | Parolă            |
+| Utilizator    | E-mail                        | Parolă            |
 | ------------- | ----------------------------- | ----------------- |
 | Administrator | `admin.demo@usv.ro`           | `AdminDemo2026`   |
 | Student       | `student.demo@student.usv.ro` | `StudentDemo2026` |
 
-Interfața nu are încă pagină de autentificare (tichetul YT-56); până atunci conturile se folosesc direct prin API (`POST /api/v1/auth/login`). Un cont nou se creează din pagina **Înregistrare** (`/inregistrare`).
+Interfața nu are încă pagină de autentificare (tichetul YT-56); până atunci utilizatorii de demo se autentifică direct prin API (`POST /api/v1/auth/login`). Un utilizator nou se înregistrează din pagina **Înregistrare** (`/inregistrare`).
 
 ## Ce conține
 
