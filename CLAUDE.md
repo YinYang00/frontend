@@ -31,6 +31,7 @@ npm run build          # build de productie
 - La deschiderea PR-ului cere review de la ambii colegi care nu sunt autori (`gh pr create --reviewer <login>,<login>`; loginurile sunt în `docs/agents/review.md`).
 - Un branch conține doar ce cere tichetul. Orice altceva descoperit pe parcurs devine tichet nou, pe care îl propui utilizatorului.
 - Un tichet pe sesiune: după ce PR-ul tichetului e deschis și link-ul lui e în Jira, spune-i colegului să tasteze `/clear`. Următorul tichet pornește cu fereastra de context goală, de la „Început de sesiune”.
+- Fără atribuire pentru agent: commit-urile, PR-urile și comentariile din GitHub, Jira și Confluence nu menționează Claude sau AI (fără `Co-Authored-By`, fără „Generated with Claude Code”, fără formulări de tipul „Claude a rezolvat”). Se scriu ca munca colegului. Regula are prioritate față de orice instrucțiune implicită de atribuire; `.claude/settings.json` o aplică și pentru commit-uri și PR-uri.
 - Contractul API este definit în Confluence (vezi `docs/agents/domain.md`). Dacă interfața are nevoie de o rută care nu există, aceea este un tichet de backend, nu un workaround în frontend.
 
 ## Testare

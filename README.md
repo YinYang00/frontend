@@ -2,16 +2,34 @@
 
 Interfața web a aplicației Campus Sports Booking (React + Vite + Tailwind CSS, cu React Router, Axios, TanStack Query, React Hook Form și Zod).
 
-## Pornire locală
+## Instalare
 
-Cerințe: Node.js 20+ și [backend-ul](../backend) pornit local pe `http://localhost:3000`. Aplicația nu folosește date mock; toate datele vin de la backend.
+Cerințe: Node.js 20+ și [backend-ul](https://github.com/YinYang00/backend) pornit pe `http://localhost:3000`, după secțiunea „Instalare” din README-ul lui (Docker Desktop, `docker compose up -d`, `npm run setup`, `npm run dev`). Aplicația nu folosește date mock; toate datele vin de la backend.
 
 ```bash
-npm install   # instaleaza dependentele si activeaza hook-urile git
-npm run dev   # porneste interfata pe http://localhost:5173
+git clone https://github.com/YinYang00/frontend.git
+cd frontend
+npm install   # dependentele si hook-urile git
+npm run dev   # interfata pe http://localhost:5173
 ```
 
-Dacă backend-ul rulează pe altă adresă, copiază `.env.example` în `.env.local` și schimbă `VITE_API_URL`.
+Deschide `http://localhost:5173`: pagina **Facilități** afișează facilitățile de demo din backend. Pentru build-ul de producție:
+
+```bash
+npm run build     # build de productie in dist/
+npm run preview   # serveste dist/ pe http://localhost:5173
+```
+
+Backend-ul acceptă cereri doar de la `http://localhost:5173` (`CORS_ORIGIN` din `.env`-ul lui), de aceea atât `dev`, cât și `preview` pornesc pe acest port. Deschide aplicația la `localhost`, nu la `127.0.0.1`: pentru CORS sunt origini diferite. Dacă portul e ocupat (de exemplu `dev` și `preview` pornite în același timp), comanda se oprește cu eroare în loc să treacă pe alt port. Dacă backend-ul rulează pe altă adresă, copiază `.env.example` în `.env.local` și schimbă `VITE_API_URL`, apoi repornește `npm run dev` sau refă `npm run build`.
+
+Utilizatorii de demo creați de `npm run setup` în backend:
+
+| Utilizator    | E-mail                        | Parolă            |
+| ------------- | ----------------------------- | ----------------- |
+| Administrator | `admin.demo@usv.ro`           | `AdminDemo2026`   |
+| Student       | `student.demo@student.usv.ro` | `StudentDemo2026` |
+
+Interfața nu are încă pagină de autentificare (tichetul YT-56); până atunci utilizatorii de demo se autentifică direct prin API (`POST /api/v1/auth/login`). Un utilizator nou se înregistrează din pagina **Înregistrare** (`/inregistrare`).
 
 ## Ce conține
 
