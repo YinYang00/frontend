@@ -71,10 +71,11 @@ export default function SesiuneProvider({ children }) {
     () => ({
       stare,
       utilizator: stare === 'autentificat' ? profil.data : undefined,
+      eroare: stare === 'eroare' ? profil.error : undefined,
       incepeSesiunea,
       incheieSesiunea,
     }),
-    [stare, profil.data, incepeSesiunea, incheieSesiunea],
+    [stare, profil.data, profil.error, incepeSesiunea, incheieSesiunea],
   );
 
   return (

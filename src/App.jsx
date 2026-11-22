@@ -23,13 +23,14 @@ export default function App() {
               <Route path="/facilitati" element={<FacilitatiPage />} />
               <Route path="/inregistrare" element={<InregistrarePage />} />
               <Route path="/autentificare" element={<AutentificarePage />} />
-              {/* Paginile lor intra ca rute copil: /rezervari cu YT-61,
-                  /admin/facilitati cu YT-58. */}
-              <Route path="/rezervari/*" element={<RutaProtejata />} />
-              <Route
-                path="/admin/*"
-                element={<RutaProtejata rol="Administrator" />}
-              />
+              <Route element={<RutaProtejata />}>
+                {/* TODO(YT-61): pagina rezervarilor in locul rutei goale */}
+                <Route path="/rezervari/*" />
+              </Route>
+              <Route element={<RutaProtejata rol="Administrator" />}>
+                {/* TODO(YT-58): administrarea facilitatilor in locul rutei goale */}
+                <Route path="/admin/*" />
+              </Route>
             </Routes>
           </main>
           <AppFooter />

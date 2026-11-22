@@ -13,22 +13,27 @@ const CATEGORII = {
   PersonalAdministrativ: 'Personal administrativ',
 };
 
-// Rolul folosit in meniu pentru o persoana neautentificata (GLOSSARY.md, Guest).
+// Guest nu e un rol (GLOSSARY.md), dar meniul il trateaza la fel: cine vede
+// fiecare element.
 const GUEST = 'Guest';
 
-// Meniul principal si rolurile care vad fiecare element.
+// Meniul principal si cine vede fiecare element.
 const PAGINI = [
   {
     to: '/facilitati',
     label: 'Facilități',
-    roluri: [GUEST, 'Utilizator', 'Administrator'],
+    vizibilPentru: [GUEST, 'Utilizator', 'Administrator'],
   },
   {
     to: '/rezervari',
     label: 'Rezervările mele',
-    roluri: ['Utilizator', 'Administrator'],
+    vizibilPentru: ['Utilizator', 'Administrator'],
   },
-  { to: '/admin/facilitati', label: 'Administrare', roluri: ['Administrator'] },
+  {
+    to: '/admin/facilitati',
+    label: 'Administrare',
+    vizibilPentru: ['Administrator'],
+  },
 ];
 
 /**
@@ -36,11 +41,14 @@ const PAGINI = [
  * pe pagina pe care era.
  */
 function LinkAutentificare() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, state } = useLocation();
+  // Pe pagina de autentificare pastreaza pagina de intoarcere primita deja.
+  const stareNoua =
+    pathname === '/autentificare' ? state : { dela: pathname + search };
   return (
     <NavLink
       to="/autentificare"
-      state={{ dela: pathname + search }}
+      state={stareNoua}
       className="btn btn-primar text-sm"
     >
       Autentificare
@@ -101,12 +109,12 @@ function ZonaUtilizator() {
 /**
  * Paginile din meniu pe care le vede rolul dat.
  * @param {object} props
- * @param {string} props.rol `Guest`, `Utilizator` sau `Administrator`.
+ * @param {string} props.rol Rolul utilizatorului sau `Guest`.
  */
 function ListaPagini({ rol }) {
   return (
     <ul className="flex flex-col text-sm md:flex-row md:gap-6">
-      {PAGINI.filter(({ roluri }) => roluri.includes(rol)).map(
+      {PAGINI.filter(({ vizibilPentru }) => vizibilPentru.includes(rol)).map(
         ({ to, label }) => (
           <li key={to}>
             <NavLink
@@ -157,8 +165,9 @@ function useMeniuMobil() {
  * ecran ingust meniul se strange intr-un buton.
  */
 export default function AppHeader() {
-  const { utilizator } = useSesiune();
-  const rol = utilizator?.rol ?? GUEST;
+  const { stare, utilizator } = useSesiune();
+  // Cat se incarca profilul se stie doar ca exista un cont, nu si rolul lui.
+  const rol = stare === 'guest' ? GUEST : (utilizator?.rol ?? 'Utilizator');
   const { isDeschis, comuta, butonRef } = useMeniuMobil();
   const idMeniu = useId();
 

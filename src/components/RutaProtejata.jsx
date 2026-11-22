@@ -1,5 +1,6 @@
 import { Link, Navigate, Outlet, useLocation } from 'react-router';
 
+import { getErrorMessage } from '../api/httpClient.js';
 import { useSesiune } from '../hooks/useSesiune.js';
 
 import StatusMessage from './StatusMessage.jsx';
@@ -26,13 +27,13 @@ function NuAiAcces() {
 /**
  * Ruta parinte pentru paginile care cer cont. Un Guest ajunge la
  * autentificare, de unde revine pe pagina ceruta (`state.dela`); un
- * utilizator fara rolul cerut vede „Nu ai acces la această pagină”.
+ * utilizator fara rolul cerut vede mesajul ca nu are acces.
  * @param {object} props
  * @param {'Administrator'} [props.rol] Rolul cerut; lipseste cand ajunge
  *   orice utilizator autentificat.
  */
 export default function RutaProtejata({ rol }) {
-  const { stare, utilizator } = useSesiune();
+  const { stare, utilizator, eroare } = useSesiune();
   const { pathname, search } = useLocation();
 
   if (stare === 'guest') {
@@ -55,9 +56,7 @@ export default function RutaProtejata({ rol }) {
   }
   if (stare === 'eroare') {
     return (
-      <StatusMessage varianta="eroare">
-        Pagina nu se poate afișa: profilul nu s-a putut încărca.
-      </StatusMessage>
+      <StatusMessage varianta="eroare">{getErrorMessage(eroare)}</StatusMessage>
     );
   }
   if (rol && utilizator.rol !== rol) {

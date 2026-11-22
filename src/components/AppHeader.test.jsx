@@ -57,6 +57,16 @@ describe('AppHeader', () => {
     expect(elementeMeniu()).toEqual(['Facilități', 'Rezervările mele']);
   });
 
+  it('cat se incarca profilul arata meniul oricarui utilizator autentificat', async () => {
+    salveazaToken('abc.def.ghi');
+    vi.mocked(getProfil).mockReturnValue(new Promise(() => {}));
+
+    renderAplicatia('/', <Route path="/" element={<p>Acasă</p>} />);
+
+    await screen.findByRole('status', { name: 'Se încarcă profilul' });
+    expect(elementeMeniu()).toEqual(['Facilități', 'Rezervările mele']);
+  });
+
   it('Administratorul vede si Administrare', async () => {
     await renderAutentificat({
       ...ANA,

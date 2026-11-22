@@ -65,6 +65,26 @@ describe('RutaProtejata', () => {
     ).toBeInTheDocument();
   });
 
+  it('pastreaza ruta ceruta si dupa linkul Autentificare din meniu', async () => {
+    vi.mocked(loginUtilizator).mockResolvedValue({
+      token: 'abc.def.ghi',
+      utilizator: ANA,
+    });
+    const user = renderAplicatia('/rezervari', RUTE);
+    await screen.findByRole('heading', { name: 'Autentificare' });
+
+    await user.click(
+      within(screen.getByRole('banner')).getByRole('link', {
+        name: 'Autentificare',
+      }),
+    );
+    await user.type(screen.getByLabelText('E-mail'), ANA.email);
+    await user.type(screen.getByLabelText('Parolă'), 'parola123');
+    await user.click(screen.getByRole('button', { name: 'Autentifică-te' }));
+
+    expect(await screen.findByText('Pagina rezervărilor')).toBeInTheDocument();
+  });
+
   it('arata Nu ai acces unui Utilizator pe o ruta de administrare', async () => {
     salveazaToken('abc.def.ghi');
     vi.mocked(getProfil).mockResolvedValue(ANA);
@@ -114,11 +134,7 @@ describe('RutaProtejata', () => {
 
     renderAplicatia('/rezervari', RUTE);
 
-    expect(
-      await screen.findByText(
-        'Pagina nu se poate afișa: profilul nu s-a putut încărca.',
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Eroare.')).toBeInTheDocument();
     expect(screen.queryByText('Pagina rezervărilor')).not.toBeInTheDocument();
   });
 });
