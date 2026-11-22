@@ -22,6 +22,8 @@ const PATHS = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  meniu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  inchidere: <path d="M18 6 6 18M6 6l12 12" />,
   editare: <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />,
   stergere: <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" />,
 };
