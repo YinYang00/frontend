@@ -24,6 +24,20 @@ function inlocuiesteReteaua(raspunde) {
   };
 }
 
+// Anularile ascultatorilor inregistrati in testul curent; afterEach le
+// apeleaza chiar daca o asertiune a picat, ca testele sa nu se influenteze.
+let renuntari = [];
+
+/**
+ * Inregistreaza un ascultator de expirare, sters automat dupa test.
+ * @returns {import('vitest').Mock} Ascultatorul.
+ */
+function ascultaExpirarea() {
+  const laExpirare = vi.fn();
+  renuntari.push(onSesiuneExpirata(laExpirare));
+  return laExpirare;
+}
+
 describe('httpClient', () => {
   const adaptorOriginal = httpClient.defaults.adapter;
 
@@ -33,6 +47,8 @@ describe('httpClient', () => {
 
   afterEach(() => {
     httpClient.defaults.adapter = adaptorOriginal;
+    renuntari.forEach((renunta) => renunta());
+    renuntari = [];
   });
 
   it('pune tokenul salvat in antetul Authorization', async () => {
@@ -54,13 +70,11 @@ describe('httpClient', () => {
       antete(config.headers.Authorization);
       return { status: 401 };
     });
-    const laExpirare = vi.fn();
-    const renunta = onSesiuneExpirata(laExpirare);
+    const laExpirare = ascultaExpirarea();
     salveazaToken('expirat');
 
     await expect(httpClient.get('/rezervari')).rejects.toThrow();
     await expect(httpClient.get('/rezervari')).rejects.toThrow();
-    renunta();
 
     expect(laExpirare).toHaveBeenCalledTimes(1);
     expect(antete).toHaveBeenLastCalledWith(undefined);
@@ -68,11 +82,9 @@ describe('httpClient', () => {
 
   it('nu anunta sesiunea la 401 pe o cerere fara token (login gresit)', async () => {
     inlocuiesteReteaua(() => ({ status: 401 }));
-    const laExpirare = vi.fn();
-    const renunta = onSesiuneExpirata(laExpirare);
+    const laExpirare = ascultaExpirarea();
 
     await expect(httpClient.post('/auth/login', {})).rejects.toThrow();
-    renunta();
 
     expect(laExpirare).not.toHaveBeenCalled();
   });
@@ -83,12 +95,10 @@ describe('httpClient', () => {
       antete(config.headers.Authorization);
       return { status: 401 };
     });
-    const laExpirare = vi.fn();
-    const renunta = onSesiuneExpirata(laExpirare);
+    const laExpirare = ascultaExpirarea();
     salveazaToken('valid');
 
     await expect(httpClient.post('/auth/login', {})).rejects.toThrow();
-    renunta();
 
     expect(antete).toHaveBeenCalledWith(undefined);
     expect(laExpirare).not.toHaveBeenCalled();
@@ -115,8 +125,7 @@ describe('httpClient', () => {
             ),
           );
       });
-    const laExpirare = vi.fn();
-    const renunta = onSesiuneExpirata(laExpirare);
+    const laExpirare = ascultaExpirarea();
     salveazaToken('vechi');
     const cerereVeche = httpClient.get('/rezervari');
     await vi.waitFor(() => expect(raspundeServerul).toBeDefined());
@@ -124,7 +133,6 @@ describe('httpClient', () => {
     salveazaToken('nou');
     raspundeServerul();
     await expect(cerereVeche).rejects.toThrow();
-    renunta();
 
     expect(laExpirare).not.toHaveBeenCalled();
     expect(areToken()).toBe(true);
