@@ -22,6 +22,29 @@ function LinkInapoi() {
 }
 
 /**
+ * Butonul de rezervare, doar pe sloturile libere.
+ * @param {object} props
+ * @param {object} props.slot
+ * @param {(slot: object) => void} props.onRezerva
+ */
+function ButonRezerva({ slot, onRezerva }) {
+  if (slot.stare !== 'Liber') {
+    return null;
+  }
+  const interval = `${formatOra(slot.ora_inceput)} – ${formatOra(slot.ora_sfarsit)}`;
+  return (
+    <button
+      type="button"
+      className="btn btn-primar"
+      aria-label={`Rezervă ${interval}`}
+      onClick={() => onRezerva(slot)}
+    >
+      Rezervă
+    </button>
+  );
+}
+
+/**
  * Pagina publica a unei facilitati: detaliile ei si calendarul sloturilor.
  */
 export default function FacilitatePage() {
@@ -34,7 +57,7 @@ export default function FacilitatePage() {
   const { pathname, search } = useLocation();
 
   // Guest-ul se autentifica si revine aici, in aceeasi zi (`?zi=` din adresa).
-  const onRezerva = (slot) =>
+  const handleRezerva = (slot) =>
     stare === 'guest'
       ? navigate('/autentificare', { state: { dela: pathname + search } })
       : setSlotAles(slot);
@@ -68,18 +91,9 @@ export default function FacilitatePage() {
       </header>
       <CalendarSloturi
         facilitate={facilitate}
-        renderActiune={(slot) =>
-          slot.stare === 'Liber' && (
-            <button
-              type="button"
-              className="btn btn-primar"
-              aria-label={`Rezervă ${formatOra(slot.ora_inceput)} – ${formatOra(slot.ora_sfarsit)}`}
-              onClick={() => onRezerva(slot)}
-            >
-              Rezervă
-            </button>
-          )
-        }
+        renderActiune={(slot) => (
+          <ButonRezerva slot={slot} onRezerva={handleRezerva} />
+        )}
       />
       {slotAles && (
         <RezervareDialog

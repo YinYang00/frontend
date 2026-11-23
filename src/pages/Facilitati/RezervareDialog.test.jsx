@@ -147,6 +147,11 @@ describe('Rezervarea unui slot', () => {
     await user.click(screen.getByRole('button', { name: 'Rezervă locul' }));
 
     expect(screen.getByRole('button', { name: 'Se rezervă…' })).toBeDisabled();
+
+    // Inchis acum, utilizatorul n-ar mai afla daca rezervarea s-a facut.
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Închide' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('nu ofera rezervarea pe sloturile Ocupat si Mentenanta', async () => {

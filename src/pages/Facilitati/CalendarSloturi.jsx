@@ -63,11 +63,11 @@ export default function CalendarSloturi({ facilitate, renderActiune }) {
   const ziAleasa = zile.some(({ data }) => data === ziDinAdresa)
     ? ziDinAdresa
     : zile[0].data;
-  const onAlege = (zi) => setParametri({ zi }, { replace: true });
+  const handleAlege = (zi) => setParametri({ zi }, { replace: true });
 
   return (
     <section aria-label="Calendarul sloturilor" className="flex flex-col gap-4">
-      <BandaZile zile={zile} ziAleasa={ziAleasa} onAlege={onAlege} />
+      <BandaZile zile={zile} ziAleasa={ziAleasa} onAlege={handleAlege} />
       <SloturiZilei
         facilitate={facilitate}
         zi={ziAleasa}

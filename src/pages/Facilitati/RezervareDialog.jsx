@@ -46,6 +46,34 @@ function DetaliiSlot({ facilitate, slot }) {
 }
 
 /**
+ * Refuzul sau confirmarea rezervarii, cu link spre detaliile ei.
+ * @param {object} props
+ * @param {import('@tanstack/react-query').UseMutationResult} props.rezervare
+ */
+function RezultatRezervare({ rezervare }) {
+  return (
+    <div className="mt-4 flex flex-col gap-3">
+      {rezervare.isError && (
+        <StatusMessage varianta="eroare">
+          {getMesajRefuz(rezervare.error)}
+        </StatusMessage>
+      )}
+      {rezervare.isSuccess && (
+        <>
+          <StatusMessage varianta="succes">Rezervare confirmată</StatusMessage>
+          <Link
+            to={`/rezervari/${rezervare.data.id_rezervare}`}
+            className="text-sm text-usv hover:underline"
+          >
+            Vezi detaliile rezervării
+          </Link>
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
  * Dialogul de rezervare a unui slot liber. Se inchide cu Escape, cu
  * atingerea in afara lui sau cu butonul Inchide; focusul revine apoi pe
  * elementul care l-a deschis.
@@ -57,17 +85,24 @@ function DetaliiSlot({ facilitate, slot }) {
 export default function RezervareDialog({ facilitate, slot, onInchide }) {
   const rezervare = useCreateRezervare();
   const refInchide = useRef(null);
+  // Cat cererea e in curs dialogul ramane deschis: altfel utilizatorul n-ar
+  // afla daca rezervarea s-a facut.
+  const handleInchide = rezervare.isPending ? undefined : onInchide;
 
   useEffect(() => {
     const deschizator = document.activeElement;
     refInchide.current.focus();
-    const onKeyDown = (event) => event.key === 'Escape' && onInchide();
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      deschizator?.focus();
-    };
-  }, [onInchide]);
+    return () => deschizator?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!handleInchide) {
+      return undefined;
+    }
+    const handleKeyDown = (event) => event.key === 'Escape' && handleInchide();
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleInchide]);
 
   return (
     <div className="fixed inset-0 z-10 flex items-end justify-center p-4 sm:items-center">
@@ -77,7 +112,7 @@ export default function RezervareDialog({ facilitate, slot, onInchide }) {
         aria-hidden="true"
         tabIndex={-1}
         className="absolute inset-0 bg-ink/40"
-        onClick={onInchide}
+        onClick={handleInchide}
       />
       <div
         role="dialog"
@@ -89,32 +124,13 @@ export default function RezervareDialog({ facilitate, slot, onInchide }) {
           Rezervă slotul
         </h2>
         <DetaliiSlot facilitate={facilitate} slot={slot} />
-        <div className="mt-4 flex flex-col gap-3">
-          {rezervare.isError && (
-            <StatusMessage varianta="eroare">
-              {getMesajRefuz(rezervare.error)}
-            </StatusMessage>
-          )}
-          {rezervare.isSuccess && (
-            <>
-              <StatusMessage varianta="succes">
-                Rezervare confirmată
-              </StatusMessage>
-              <Link
-                to={`/rezervari/${rezervare.data.id_rezervare}`}
-                className="text-sm text-usv hover:underline"
-              >
-                Vezi detaliile rezervării
-              </Link>
-            </>
-          )}
-        </div>
+        <RezultatRezervare rezervare={rezervare} />
         <div className="mt-6 flex justify-end gap-3">
           <button
             ref={refInchide}
             type="button"
             className="btn btn-secundar"
-            onClick={onInchide}
+            onClick={handleInchide}
           >
             Închide
           </button>
