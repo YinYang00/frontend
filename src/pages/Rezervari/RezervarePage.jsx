@@ -13,7 +13,7 @@ const HTTP_NOT_FOUND = 404;
 const MESAJ_NEGASITA = 'Rezervarea nu există.';
 
 // Id-ul unei rezervari e un numar intreg pozitiv; altfel backend-ul ar da 400.
-const ID_REZERVARE = /^[1-9]\d*$/;
+const FORMAT_ID_REZERVARE = /^[1-9]\d*$/;
 
 /**
  * Legatura inapoi la lista rezervarilor.
@@ -61,7 +61,7 @@ function Detaliu({ termen, children }) {
  */
 export default function RezervarePage() {
   const { id } = useParams();
-  const idValid = ID_REZERVARE.test(id);
+  const idValid = FORMAT_ID_REZERVARE.test(id);
   const {
     data: rezervare,
     isPending,

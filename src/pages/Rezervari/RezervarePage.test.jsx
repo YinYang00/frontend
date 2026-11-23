@@ -39,7 +39,7 @@ const REZERVARE = {
 
 const RUTE = <Route path="/rezervari/:id" element={<RezervarePage />} />;
 
-const NEGASITA = {
+const EROARE_NEGASITA = {
   response: {
     status: 404,
     data: {
@@ -125,7 +125,7 @@ describe('RezervarePage', () => {
   });
 
   it('la 404 spune ca rezervarea nu exista dupa o singura cerere', async () => {
-    vi.mocked(getRezervare).mockRejectedValue(NEGASITA);
+    vi.mocked(getRezervare).mockRejectedValue(EROARE_NEGASITA);
 
     renderCuReincercari('/rezervari/99');
 
