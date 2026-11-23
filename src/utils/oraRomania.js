@@ -4,7 +4,9 @@ const FUS_ORAR = 'Europe/Bucharest';
 const LIMBA = 'ro-RO';
 const ZILE_IN_BANDA = 14;
 
-const FORMATTER_ZI_ISO = new Intl.DateTimeFormat('en-CA', {
+// Data de azi se citeste pe bucati (formatToParts), nu din textul formatat:
+// ordinea si separatorii datei depind de datele de localizare ale browserului.
+const FORMATTER_ZI_ROMANIA = new Intl.DateTimeFormat(LIMBA, {
   timeZone: FUS_ORAR,
   year: 'numeric',
   month: '2-digit',
@@ -46,9 +48,13 @@ export function formatOra(moment) {
  *   „25 oct.”.
  */
 export function getZileBanda() {
-  const [an, luna, zi] = FORMATTER_ZI_ISO.format(new Date())
-    .split('-')
-    .map(Number);
+  const parti = Object.fromEntries(
+    FORMATTER_ZI_ROMANIA.formatToParts(new Date()).map(({ type, value }) => [
+      type,
+      Number(value),
+    ]),
+  );
+  const { year: an, month: luna, day: zi } = parti;
   return Array.from({ length: ZILE_IN_BANDA }, (_, index) => {
     const moment = new Date(Date.UTC(an, luna - 1, zi + index));
     return {
