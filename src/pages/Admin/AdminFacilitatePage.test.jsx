@@ -7,7 +7,10 @@ import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 
 import AdminFacilitatePage from './AdminFacilitatePage.jsx';
 
-vi.mock('../../api/facilitatiApi.js', () => ({ getFacilitate: vi.fn() }));
+vi.mock('../../api/facilitatiApi.js', () => ({
+  getFacilitate: vi.fn(),
+  createSloturi: vi.fn(),
+}));
 vi.mock('../../api/utilizatoriApi.js', () => ({ getProfil: vi.fn() }));
 
 const RUTE = (

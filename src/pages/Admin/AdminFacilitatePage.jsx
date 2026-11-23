@@ -4,6 +4,8 @@ import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
 import { useFacilitate } from '../../hooks/useFacilitati.js';
 
+import GenerareSloturi from './GenerareSloturi.jsx';
+
 /**
  * Legatura inapoi la lista de administrare.
  */
@@ -50,6 +52,8 @@ export default function AdminFacilitatePage() {
           {facilitate.tip} · {facilitate.locatie}
         </p>
       </header>
+      {/* key: alta facilitate porneste cu formularul si rezultatul goale. */}
+      <GenerareSloturi key={id} idFacilitate={id} />
     </section>
   );
 }

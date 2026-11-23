@@ -58,19 +58,36 @@ export function formatOra(moment) {
 }
 
 /**
- * Ziua de azi si urmatoarele 13, in ora Romaniei.
- * @returns {{data: string, ziSaptamana: string, ziLuna: string}[]} `data`
- *   este `AAAA-LL-ZZ`; celelalte sunt textele afisate, de exemplu „dum.” si
- *   „25 oct.”.
+ * Anul, luna si ziua de azi, in ora Romaniei.
+ * @returns {{an: number, luna: number, zi: number}}
  */
-export function getZileBanda() {
+function getPartiAzi() {
   const parti = Object.fromEntries(
     FORMATTER_ZI_ROMANIA.formatToParts(new Date()).map(({ type, value }) => [
       type,
       Number(value),
     ]),
   );
-  const { year: an, month: luna, day: zi } = parti;
+  return { an: parti.year, luna: parti.month, zi: parti.day };
+}
+
+/**
+ * Data de azi, in ora Romaniei.
+ * @returns {string} `AAAA-LL-ZZ`.
+ */
+export function getAziRomania() {
+  const { an, luna, zi } = getPartiAzi();
+  return `${an}-${String(luna).padStart(2, '0')}-${String(zi).padStart(2, '0')}`;
+}
+
+/**
+ * Ziua de azi si urmatoarele 13, in ora Romaniei.
+ * @returns {{data: string, ziSaptamana: string, ziLuna: string}[]} `data`
+ *   este `AAAA-LL-ZZ`; celelalte sunt textele afisate, de exemplu „dum.” si
+ *   „25 oct.”.
+ */
+export function getZileBanda() {
+  const { an, luna, zi } = getPartiAzi();
   return Array.from({ length: ZILE_IN_BANDA }, (_, index) => {
     const moment = new Date(Date.UTC(an, luna - 1, zi + index));
     return {
