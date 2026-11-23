@@ -22,12 +22,15 @@ export function useRezervari() {
 /**
  * O rezervare a utilizatorului autentificat, cu codul ei.
  * @param {number | string} idRezervare
+ * @param {object} [optiuni]
+ * @param {boolean} [optiuni.enabled] `false` cand cererea nu trebuie trimisa.
  * @returns {import('@tanstack/react-query').UseQueryResult<object>}
  */
-export function useRezervare(idRezervare) {
+export function useRezervare(idRezervare, { enabled = true } = {}) {
   return useQuery({
     queryKey: [...REZERVARI_KEY, idRezervare],
     queryFn: () => getRezervare(idRezervare),
+    enabled,
   });
 }
 
