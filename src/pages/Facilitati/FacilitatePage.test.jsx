@@ -93,6 +93,25 @@ describe('FacilitatePage', () => {
     ]);
   });
 
+  it('arata ambele sloturi de la 03:00 din noaptea trecerii la ora de iarna', async () => {
+    // La 01:00Z ceasul se da inapoi de la 04:00 la 03:00, deci ora 03:00
+    // apare de doua ori: o data la +03:00 (00:00Z), o data la +02:00 (01:00Z).
+    vi.mocked(getSloturi).mockResolvedValue([
+      slot(2, '2026-10-25T01:00:00Z', 'Liber', 30),
+      slot(1, '2026-10-25T00:00:00Z', 'Liber', 30),
+    ]);
+
+    renderAplicatia('/facilitati/7', RUTE);
+
+    const sloturi = within(
+      await screen.findByRole('list', { name: 'Sloturile zilei' }),
+    ).getAllByRole('listitem');
+    expect(sloturi.map((element) => element.textContent)).toEqual([
+      expect.stringMatching(/^03:00 – 03:00/),
+      expect.stringMatching(/^03:00 – 04:00/),
+    ]);
+  });
+
   it('nu arata locurile libere la o facilitate cu capacitatea 1', async () => {
     vi.mocked(getFacilitate).mockResolvedValue({
       ...BAZIN,
