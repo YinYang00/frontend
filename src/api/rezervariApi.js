@@ -20,3 +20,13 @@ export async function createRezervare(idSlot) {
   const { data } = await httpClient.post('/rezervari', { id_slot: idSlot });
   return data;
 }
+
+/**
+ * GET /rezervari/{id_rezervare}
+ * @param {number | string} idRezervare
+ * @returns {Promise<object>} Rezervarea, cu `slot`, `facilitate` si `cod_qr`.
+ */
+export async function getRezervare(idRezervare) {
+  const { data } = await httpClient.get(`/rezervari/${idRezervare}`);
+  return data;
+}
