@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
@@ -55,11 +56,18 @@ function BandaZile({ zile, ziAleasa, onAlege }) {
  */
 export default function CalendarSloturi({ facilitate, renderActiune }) {
   const [zile] = useState(getZileBanda);
-  const [ziAleasa, setZiAleasa] = useState(zile[0].data);
+  // Ziua aleasa sta in adresa (`?zi=`), ca revenirea de la autentificare sa
+  // deschida aceeasi zi; o zi din afara benzii inseamna azi.
+  const [parametri, setParametri] = useSearchParams();
+  const ziDinAdresa = parametri.get('zi');
+  const ziAleasa = zile.some(({ data }) => data === ziDinAdresa)
+    ? ziDinAdresa
+    : zile[0].data;
+  const onAlege = (zi) => setParametri({ zi }, { replace: true });
 
   return (
     <section aria-label="Calendarul sloturilor" className="flex flex-col gap-4">
-      <BandaZile zile={zile} ziAleasa={ziAleasa} onAlege={setZiAleasa} />
+      <BandaZile zile={zile} ziAleasa={ziAleasa} onAlege={onAlege} />
       <SloturiZilei
         facilitate={facilitate}
         zi={ziAleasa}
