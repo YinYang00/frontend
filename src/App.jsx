@@ -10,6 +10,7 @@ import AutentificarePage from './pages/Autentificare/AutentificarePage.jsx';
 import FacilitatePage from './pages/Facilitati/FacilitatePage.jsx';
 import FacilitatiPage from './pages/Facilitati/FacilitatiPage.jsx';
 import InregistrarePage from './pages/Inregistrare/InregistrarePage.jsx';
+import RezervarePage from './pages/Rezervari/RezervarePage.jsx';
 import RezervariPage from './pages/Rezervari/RezervariPage.jsx';
 
 /**
@@ -30,8 +31,7 @@ export default function App() {
               <Route path="/autentificare" element={<AutentificarePage />} />
               <Route element={<RutaProtejata />}>
                 <Route path="/rezervari" element={<RezervariPage />} />
-                {/* TODO(YT-62): pagina detaliilor in locul rutei goale */}
-                <Route path="/rezervari/:id" />
+                <Route path="/rezervari/:id" element={<RezervarePage />} />
               </Route>
               <Route element={<RutaProtejata rol="Administrator" />}>
                 <Route

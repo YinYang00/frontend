@@ -1,16 +1,34 @@
 // Hook-urile TanStack Query pentru rezervari.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { createRezervare, getRezervari } from '../api/rezervariApi.js';
+import {
+  createRezervare,
+  getRezervare,
+  getRezervari,
+} from '../api/rezervariApi.js';
 
 import { SLOTURI_KEY } from './useSloturi.js';
+
+export const REZERVARI_KEY = ['rezervari'];
 
 /**
  * Rezervarile utilizatorului autentificat.
  * @returns {import('@tanstack/react-query').UseQueryResult<object[]>}
  */
 export function useRezervari() {
-  return useQuery({ queryKey: ['rezervari'], queryFn: getRezervari });
+  return useQuery({ queryKey: REZERVARI_KEY, queryFn: getRezervari });
+}
+
+/**
+ * O rezervare a utilizatorului autentificat, cu codul ei.
+ * @param {number | string} idRezervare
+ * @returns {import('@tanstack/react-query').UseQueryResult<object>}
+ */
+export function useRezervare(idRezervare) {
+  return useQuery({
+    queryKey: [...REZERVARI_KEY, idRezervare],
+    queryFn: () => getRezervare(idRezervare),
+  });
 }
 
 /**
