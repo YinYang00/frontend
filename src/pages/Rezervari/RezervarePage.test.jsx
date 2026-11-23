@@ -3,6 +3,7 @@ import { Route } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { salveazaToken } from '../../api/httpClient.js';
+import { creeazaQueryClient } from '../../api/queryClient.js';
 import { getRezervare } from '../../api/rezervariApi.js';
 import { getProfil } from '../../api/utilizatoriApi.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
@@ -37,6 +38,27 @@ const REZERVARE = {
 };
 
 const RUTE = <Route path="/rezervari/:id" element={<RezervarePage />} />;
+
+const NEGASITA = {
+  response: {
+    status: 404,
+    data: {
+      cod: 'REZERVARE_NEGASITA',
+      mesaj: 'Rezervarea cu id 99 nu exista.',
+    },
+  },
+};
+
+/**
+ * Randeaza pagina cu clientul aplicatiei, deci cu politica ei de
+ * reincercare, fara pauza intre incercari.
+ * @param {string} ruta
+ */
+function renderCuReincercari(ruta) {
+  renderAplicatia(ruta, RUTE, {
+    queryClient: creeazaQueryClient({ retryDelay: 0 }),
+  });
+}
 
 describe('RezervarePage', () => {
   beforeEach(() => {
@@ -101,4 +123,45 @@ describe('RezervarePage', () => {
       'Serverul nu răspunde',
     );
   });
+
+  it('la 404 spune ca rezervarea nu exista dupa o singura cerere', async () => {
+    vi.mocked(getRezervare).mockRejectedValue(NEGASITA);
+
+    renderCuReincercari('/rezervari/99');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Rezervarea nu există',
+    );
+    expect(getRezervare).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['serverul nu raspunde', { request: {} }],
+    [
+      'serverul da 500',
+      { response: { status: 500, data: { mesaj: 'Eroare interna.' } } },
+    ],
+  ])('reincearca o data cand %s', async (_caz, eroare) => {
+    vi.mocked(getRezervare).mockRejectedValue(eroare);
+
+    renderCuReincercari('/rezervari/7');
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(getRezervare).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['abc', '0'])(
+    'la /rezervari/%s spune ca rezervarea nu exista, fara cerere',
+    async (id) => {
+      renderAplicatia(`/rezervari/${id}`, RUTE);
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Rezervarea nu există',
+      );
+      expect(
+        screen.getByRole('link', { name: /Înapoi la rezervări/ }),
+      ).toHaveAttribute('href', '/rezervari');
+      expect(getRezervare).not.toHaveBeenCalled();
+    },
+  );
 });

@@ -10,6 +10,11 @@ import { getEticheta } from './etichetaRezervare.js';
 
 const HTTP_NOT_FOUND = 404;
 
+const MESAJ_NEGASITA = 'Rezervarea nu există.';
+
+// Id-ul unei rezervari e un numar intreg pozitiv; altfel backend-ul ar da 400.
+const ID_REZERVARE = /^[1-9]\d*$/;
+
 /**
  * Legatura inapoi la lista rezervarilor.
  */
@@ -18,6 +23,20 @@ function LinkInapoi() {
     <Link to="/rezervari" className="text-sm text-usv hover:underline">
       ← Înapoi la rezervări
     </Link>
+  );
+}
+
+/**
+ * Mesajul de eroare al paginii, cu legatura inapoi la lista rezervarilor.
+ * @param {object} props
+ * @param {string} props.mesaj
+ */
+function EroareRezervare({ mesaj }) {
+  return (
+    <section className="flex flex-col items-start gap-4">
+      <StatusMessage varianta="eroare">{mesaj}</StatusMessage>
+      <LinkInapoi />
+    </section>
   );
 }
 
@@ -42,10 +61,21 @@ function Detaliu({ termen, children }) {
  */
 export default function RezervarePage() {
   const { id } = useParams();
-  const { data: rezervare, isPending, isError, error } = useRezervare(id);
+  const idValid = ID_REZERVARE.test(id);
+  const {
+    data: rezervare,
+    isPending,
+    isError,
+    error,
+  } = useRezervare(id, {
+    enabled: idValid,
+  });
   // Ora se citeste o data, la deschiderea paginii, ca in lista rezervarilor.
   const [acum] = useState(Date.now);
 
+  if (!idValid) {
+    return <EroareRezervare mesaj={MESAJ_NEGASITA} />;
+  }
   if (isPending) {
     return (
       <StatusMessage varianta="info">Se încarcă rezervarea…</StatusMessage>
@@ -56,14 +86,9 @@ export default function RezervarePage() {
     // afle ca exista.
     const mesaj =
       error?.response?.status === HTTP_NOT_FOUND
-        ? 'Rezervarea nu există.'
+        ? MESAJ_NEGASITA
         : getErrorMessage(error);
-    return (
-      <section className="flex flex-col items-start gap-4">
-        <StatusMessage varianta="eroare">{mesaj}</StatusMessage>
-        <LinkInapoi />
-      </section>
-    );
+    return <EroareRezervare mesaj={mesaj} />;
   }
 
   const { slot, facilitate } = rezervare;
