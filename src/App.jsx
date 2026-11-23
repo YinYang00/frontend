@@ -4,6 +4,8 @@ import AppFooter from './components/AppFooter.jsx';
 import AppHeader from './components/AppHeader.jsx';
 import RutaProtejata from './components/RutaProtejata.jsx';
 import SesiuneProvider from './components/SesiuneProvider.jsx';
+import AdminFacilitatePage from './pages/Admin/AdminFacilitatePage.jsx';
+import AdminFacilitatiPage from './pages/Admin/AdminFacilitatiPage.jsx';
 import AutentificarePage from './pages/Autentificare/AutentificarePage.jsx';
 import FacilitatiPage from './pages/Facilitati/FacilitatiPage.jsx';
 import InregistrarePage from './pages/Inregistrare/InregistrarePage.jsx';
@@ -28,8 +30,14 @@ export default function App() {
                 <Route path="/rezervari/*" />
               </Route>
               <Route element={<RutaProtejata rol="Administrator" />}>
-                {/* TODO(YT-58): administrarea facilitatilor in locul rutei goale */}
-                <Route path="/admin/*" />
+                <Route
+                  path="/admin/facilitati"
+                  element={<AdminFacilitatiPage />}
+                />
+                <Route
+                  path="/admin/facilitati/:id"
+                  element={<AdminFacilitatePage />}
+                />
               </Route>
             </Routes>
           </main>

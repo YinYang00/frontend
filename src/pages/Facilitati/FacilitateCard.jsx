@@ -1,14 +1,17 @@
+import { Link } from 'react-router';
+
 import Icon from '../../components/Icon.jsx';
 
 /**
  * Cardul unei facilitati, ca in sectiunea „Facilitati populare” din Figma:
- * zona de imagine cu tipul, denumirea, locatia, capacitatea si actiunile.
+ * zona de imagine cu tipul, denumirea ca link, locatia, capacitatea si,
+ * optional, actiunile.
  * @param {object} props
  * @param {object} props.facilitate
- * @param {(facilitate: object) => void} props.onEdit
- * @param {(facilitate: object) => void} props.onDelete
+ * @param {string} props.adresa Pagina deschisa de denumirea facilitatii.
+ * @param {import('react').ReactNode} [props.children] Actiunile cardului.
  */
-export default function FacilitateCard({ facilitate, onEdit, onDelete }) {
+export default function FacilitateCard({ facilitate, adresa, children }) {
   const { denumire, tip, capacitate_maxima: capacitate, locatie } = facilitate;
 
   return (
@@ -22,7 +25,11 @@ export default function FacilitateCard({ facilitate, onEdit, onDelete }) {
       </div>
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex flex-col gap-1.5">
-          <h3 className="text-base font-semibold text-ink">{denumire}</h3>
+          <h3 className="text-base font-semibold text-ink">
+            <Link to={adresa} className="hover:text-usv hover:underline">
+              {denumire}
+            </Link>
+          </h3>
           <p className="flex items-center gap-1.5 text-sm text-muted">
             <Icon nume="locatie" className="size-3.5 shrink-0" />
             {locatie}
@@ -32,26 +39,7 @@ export default function FacilitateCard({ facilitate, onEdit, onDelete }) {
             {capacitate} {capacitate === 1 ? 'persoană' : 'persoane'}
           </p>
         </div>
-        <div className="mt-auto flex gap-2">
-          <button
-            type="button"
-            className="btn btn-soft flex-1"
-            onClick={() => onEdit(facilitate)}
-            aria-label={`Editează ${denumire}`}
-          >
-            <Icon nume="editare" className="size-3.5" />
-            Editează
-          </button>
-          <button
-            type="button"
-            className="btn btn-secundar flex-1 text-red-700"
-            onClick={() => onDelete(facilitate)}
-            aria-label={`Șterge ${denumire}`}
-          >
-            <Icon nume="stergere" className="size-3.5" />
-            Șterge
-          </button>
-        </div>
+        {children && <div className="mt-auto flex gap-2">{children}</div>}
       </div>
     </li>
   );

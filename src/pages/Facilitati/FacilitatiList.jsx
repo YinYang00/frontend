@@ -6,12 +6,15 @@ import FacilitateCard from './FacilitateCard.jsx';
 
 /**
  * Lista facilitatilor citita de la backend, cu starile de incarcare, eroare
- * si lista goala.
+ * si lista goala. Folosita de lista publica si de pagina de administrare.
  * @param {object} props
- * @param {(facilitate: object) => void} props.onEdit
- * @param {(facilitate: object) => void} props.onDelete
+ * @param {string} props.mesajGol Textul afisat cand nu exista facilitati.
+ * @param {(facilitate: object) => string} props.getAdresa Pagina deschisa de
+ *   denumirea fiecarei facilitati.
+ * @param {(facilitate: object) => import('react').ReactNode} [props.renderActiuni]
+ *   Actiunile de pe fiecare card; lipsesc in lista publica.
  */
-export default function FacilitatiList({ onEdit, onDelete }) {
+export default function FacilitatiList({ mesajGol, getAdresa, renderActiuni }) {
   const {
     data: facilitati,
     isPending,
@@ -38,11 +41,7 @@ export default function FacilitatiList({ onEdit, onDelete }) {
     );
   }
   if (facilitati.length === 0) {
-    return (
-      <StatusMessage varianta="info">
-        Nu există încă nicio facilitate. Adaugă prima facilitate.
-      </StatusMessage>
-    );
+    return <StatusMessage varianta="info">{mesajGol}</StatusMessage>;
   }
 
   return (
@@ -51,9 +50,10 @@ export default function FacilitatiList({ onEdit, onDelete }) {
         <FacilitateCard
           key={facilitate.id_facilitate}
           facilitate={facilitate}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+          adresa={getAdresa(facilitate)}
+        >
+          {renderActiuni?.(facilitate)}
+        </FacilitateCard>
       ))}
     </ul>
   );

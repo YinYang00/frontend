@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createFacilitate,
   deleteFacilitate,
+  getFacilitate,
   getFacilitati,
   updateFacilitate,
 } from '../api/facilitatiApi.js';
@@ -17,6 +18,19 @@ export const FACILITATI_KEY = ['facilitati'];
  */
 export function useFacilitati() {
   return useQuery({ queryKey: FACILITATI_KEY, queryFn: getFacilitati });
+}
+
+/**
+ * O facilitate de la server. Cheia incepe cu FACILITATI_KEY, deci si ea se
+ * reincarca dupa orice modificare.
+ * @param {string} id Id-ul din adresa paginii.
+ * @returns {import('@tanstack/react-query').UseQueryResult<object>}
+ */
+export function useFacilitate(id) {
+  return useQuery({
+    queryKey: [...FACILITATI_KEY, id],
+    queryFn: () => getFacilitate(id),
+  });
 }
 
 /**
