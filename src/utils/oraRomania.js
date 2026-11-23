@@ -58,6 +58,14 @@ export function formatOra(moment) {
 }
 
 /**
+ * Data de azi, in ora Romaniei.
+ * @returns {string} `AAAA-LL-ZZ`.
+ */
+export function getAziRomania() {
+  return getZileBanda()[0].data;
+}
+
+/**
  * Ziua de azi si urmatoarele 13, in ora Romaniei.
  * @returns {{data: string, ziSaptamana: string, ziLuna: string}[]} `data`
  *   este `AAAA-LL-ZZ`; celelalte sunt textele afisate, de exemplu „dum.” si

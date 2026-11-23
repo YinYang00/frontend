@@ -4,6 +4,8 @@ import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
 import { useFacilitate } from '../../hooks/useFacilitati.js';
 
+import GenerareSloturi from './GenerareSloturi.jsx';
+
 /**
  * Legatura inapoi la lista de administrare.
  */
@@ -50,6 +52,7 @@ export default function AdminFacilitatePage() {
           {facilitate.tip} · {facilitate.locatie}
         </p>
       </header>
+      <GenerareSloturi idFacilitate={id} />
     </section>
   );
 }

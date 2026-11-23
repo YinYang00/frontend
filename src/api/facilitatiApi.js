@@ -36,6 +36,19 @@ export async function getSloturi(id, zi) {
 }
 
 /**
+ * POST /facilitati/:id_facilitate/sloturi
+ * @param {number | string} id
+ * @param {object} program Programul zilei: `data` (`AAAA-LL-ZZ`),
+ *   `ora_inceput` si `ora_sfarsit` (`HH:MM`, ora Romaniei) si
+ *   `durata_minute`.
+ * @returns {Promise<object[]>} Sloturile create; cele care existau se sar.
+ */
+export async function createSloturi(id, program) {
+  const { data } = await httpClient.post(`${RESOURCE}/${id}/sloturi`, program);
+  return data;
+}
+
+/**
  * POST /facilitati
  * @param {object} facilitate
  * @returns {Promise<object>}
