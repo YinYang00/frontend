@@ -32,6 +32,22 @@ const FORMATTER_ORA = new Intl.DateTimeFormat(LIMBA, {
   hourCycle: 'h23',
 });
 
+const FORMATTER_ZI_LUNGA = new Intl.DateTimeFormat(LIMBA, {
+  timeZone: FUS_ORAR,
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+});
+
+/**
+ * Ziua unui moment din API, in ora Romaniei.
+ * @param {string} moment ISO 8601.
+ * @returns {string} De exemplu `marți, 24 noiembrie`.
+ */
+export function formatZi(moment) {
+  return FORMATTER_ZI_LUNGA.format(new Date(moment));
+}
+
 /**
  * Ora unui moment din API, in ora Romaniei.
  * @param {string} moment ISO 8601, de exemplu `2026-11-20T08:00:00+02:00`.

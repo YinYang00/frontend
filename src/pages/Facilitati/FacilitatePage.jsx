@@ -1,10 +1,14 @@
-import { Link, useParams } from 'react-router';
+import { useCallback, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
 import { useFacilitate } from '../../hooks/useFacilitati.js';
+import { useSesiune } from '../../hooks/useSesiune.js';
+import { formatOra } from '../../utils/oraRomania.js';
 
 import CalendarSloturi from './CalendarSloturi.jsx';
+import RezervareDialog from './RezervareDialog.jsx';
 
 /**
  * Legatura inapoi la lista publica.
@@ -18,11 +22,45 @@ function LinkInapoi() {
 }
 
 /**
+ * Butonul de rezervare, doar pe sloturile libere.
+ * @param {object} props
+ * @param {object} props.slot
+ * @param {(slot: object) => void} props.onRezerva
+ */
+function ButonRezerva({ slot, onRezerva }) {
+  if (slot.stare !== 'Liber') {
+    return null;
+  }
+  const interval = `${formatOra(slot.ora_inceput)} – ${formatOra(slot.ora_sfarsit)}`;
+  return (
+    <button
+      type="button"
+      className="btn btn-primar"
+      aria-label={`Rezervă ${interval}`}
+      onClick={() => onRezerva(slot)}
+    >
+      Rezervă
+    </button>
+  );
+}
+
+/**
  * Pagina publica a unei facilitati: detaliile ei si calendarul sloturilor.
  */
 export default function FacilitatePage() {
   const { id } = useParams();
   const { data: facilitate, isPending, isError, error } = useFacilitate(id);
+  const [slotAles, setSlotAles] = useState(null);
+  const inchideDialogul = useCallback(() => setSlotAles(null), []);
+  const { stare } = useSesiune();
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+
+  // Guest-ul se autentifica si revine aici, in aceeasi zi (`?zi=` din adresa).
+  const handleRezerva = (slot) =>
+    stare === 'guest'
+      ? navigate('/autentificare', { state: { dela: pathname + search } })
+      : setSlotAles(slot);
 
   if (isPending) {
     return (
@@ -51,7 +89,19 @@ export default function FacilitatePage() {
           {facilitate.tip} · {facilitate.locatie}
         </p>
       </header>
-      <CalendarSloturi facilitate={facilitate} />
+      <CalendarSloturi
+        facilitate={facilitate}
+        renderActiune={(slot) => (
+          <ButonRezerva slot={slot} onRezerva={handleRezerva} />
+        )}
+      />
+      {slotAles && (
+        <RezervareDialog
+          facilitate={facilitate}
+          slot={slotAles}
+          onInchide={inchideDialogul}
+        />
+      )}
     </section>
   );
 }
