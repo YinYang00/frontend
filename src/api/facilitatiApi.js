@@ -13,6 +13,16 @@ export async function getFacilitati() {
 }
 
 /**
+ * GET /facilitati/:id_facilitate
+ * @param {number | string} id
+ * @returns {Promise<object>}
+ */
+export async function getFacilitate(id) {
+  const { data } = await httpClient.get(`${RESOURCE}/${id}`);
+  return data;
+}
+
+/**
  * POST /facilitati
  * @param {object} facilitate
  * @returns {Promise<object>}
