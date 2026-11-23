@@ -9,9 +9,11 @@ export const SesiuneContext = createContext(null);
  * @returns {{
  *   stare: 'guest' | 'se-incarca' | 'eroare' | 'autentificat',
  *   utilizator: object | undefined,
+ *   eroare: unknown,
  *   incepeSesiunea: (date: {token: string, utilizator: object}) => void,
  *   incheieSesiunea: () => void,
- * }} `utilizator` exista doar in starea `autentificat`.
+ * }} `utilizator` exista doar in starea `autentificat`, iar `eroare` (de la
+ *   cererea profilului) doar in starea `eroare`.
  */
 export function useSesiune() {
   const sesiune = useContext(SesiuneContext);
