@@ -8,6 +8,7 @@ import { getAziRomania } from '../../utils/oraRomania.js';
 import { zodResolver } from '../../utils/zodResolver.js';
 
 const MESAJ_ORA = 'Alege o oră.';
+const MESAJ_DURATA = 'Durata trebuie să fie un număr întreg pozitiv de minute.';
 
 // Aceleasi reguli ca validarea din backend; ziua din trecut si durata mai
 // mare decat programul le verifica serverul. Orele `HH:MM` se compara corect
@@ -19,8 +20,8 @@ const schema = z
     ora_sfarsit: z.string().min(1, MESAJ_ORA),
     durata_minute: z.coerce
       .number({ error: 'Durata trebuie să fie un număr.' })
-      .int('Durata trebuie să fie un număr întreg pozitiv de minute.')
-      .min(1, 'Durata trebuie să fie un număr întreg pozitiv de minute.'),
+      .int(MESAJ_DURATA)
+      .min(1, MESAJ_DURATA),
   })
   .refine((program) => program.ora_sfarsit > program.ora_inceput, {
     path: ['ora_sfarsit'],
@@ -76,7 +77,12 @@ export default function GenerareSloturi({ idFacilitate }) {
       )}
       <form
         noValidate
-        onSubmit={handleSubmit((program) => generare.mutate(program))}
+        onSubmit={(event) => {
+          // Rezultatul trimiterii anterioare dispare la orice trimitere noua,
+          // si cand formularul nu trece de validare.
+          generare.reset();
+          handleSubmit((program) => generare.mutate(program))(event);
+        }}
         className="grid gap-4 sm:grid-cols-2"
       >
         {CAMPURI.map(({ name, label, type }) => (

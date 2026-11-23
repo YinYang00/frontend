@@ -52,7 +52,8 @@ export default function AdminFacilitatePage() {
           {facilitate.tip} · {facilitate.locatie}
         </p>
       </header>
-      <GenerareSloturi idFacilitate={id} />
+      {/* key: alta facilitate porneste cu formularul si rezultatul goale. */}
+      <GenerareSloturi key={id} idFacilitate={id} />
     </section>
   );
 }
