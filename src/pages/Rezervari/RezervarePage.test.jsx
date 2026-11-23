@@ -74,7 +74,10 @@ describe('RezervarePage', () => {
     vi.mocked(getRezervare).mockRejectedValue({
       response: {
         status: 404,
-        data: { cod: 'NOT_FOUND', mesaj: 'Rezervarea 99 nu există.' },
+        data: {
+          cod: 'REZERVARE_NEGASITA',
+          mesaj: 'Rezervarea cu id 99 nu exista.',
+        },
       },
     });
 

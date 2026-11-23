@@ -9,12 +9,14 @@ import {
 
 import { SLOTURI_KEY } from './useSloturi.js';
 
+export const REZERVARI_KEY = ['rezervari'];
+
 /**
  * Rezervarile utilizatorului autentificat.
  * @returns {import('@tanstack/react-query').UseQueryResult<object[]>}
  */
 export function useRezervari() {
-  return useQuery({ queryKey: ['rezervari'], queryFn: getRezervari });
+  return useQuery({ queryKey: REZERVARI_KEY, queryFn: getRezervari });
 }
 
 /**
@@ -24,7 +26,7 @@ export function useRezervari() {
  */
 export function useRezervare(idRezervare) {
   return useQuery({
-    queryKey: ['rezervari', idRezervare],
+    queryKey: [...REZERVARI_KEY, idRezervare],
     queryFn: () => getRezervare(idRezervare),
   });
 }

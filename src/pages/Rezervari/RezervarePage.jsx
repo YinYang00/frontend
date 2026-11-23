@@ -8,6 +8,8 @@ import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
 import { getEticheta } from './etichetaRezervare.js';
 
+const HTTP_NOT_FOUND = 404;
+
 /**
  * Legatura inapoi la lista rezervarilor.
  */
@@ -53,7 +55,7 @@ export default function RezervarePage() {
     // Backend-ul da 404 si pentru rezervarea altui utilizator, ca sa nu se
     // afle ca exista.
     const mesaj =
-      error?.response?.status === 404
+      error?.response?.status === HTTP_NOT_FOUND
         ? 'Rezervarea nu există.'
         : getErrorMessage(error);
     return (
@@ -64,7 +66,7 @@ export default function RezervarePage() {
     );
   }
 
-  const { slot, facilitate, cod_qr: cod } = rezervare;
+  const { slot, facilitate } = rezervare;
   return (
     <section className="flex flex-col gap-6">
       <header className="flex flex-col items-start gap-2">
@@ -82,7 +84,7 @@ export default function RezervarePage() {
         </Detaliu>
         <Detaliu termen="Stare">{getEticheta(rezervare, acum)}</Detaliu>
         <Detaliu termen="Codul rezervării">
-          <span className="font-mono break-all">{cod}</span>
+          <span className="font-mono break-all">{rezervare.cod_qr}</span>
         </Detaliu>
       </dl>
     </section>
