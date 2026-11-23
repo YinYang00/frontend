@@ -1,9 +1,17 @@
 // Hook-urile TanStack Query pentru rezervari.
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { createRezervare } from '../api/rezervariApi.js';
+import { createRezervare, getRezervari } from '../api/rezervariApi.js';
 
 import { SLOTURI_KEY } from './useSloturi.js';
+
+/**
+ * Rezervarile utilizatorului autentificat.
+ * @returns {import('@tanstack/react-query').UseQueryResult<object[]>}
+ */
+export function useRezervari() {
+  return useQuery({ queryKey: ['rezervari'], queryFn: getRezervari });
+}
 
 /**
  * Rezerva un loc intr-un slot; primeste `id_slot`. Sloturile se reincarca
