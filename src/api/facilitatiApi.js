@@ -23,6 +23,19 @@ export async function getFacilitate(id) {
 }
 
 /**
+ * GET /facilitati/:id_facilitate/sloturi?data=AAAA-LL-ZZ
+ * @param {number | string} id
+ * @param {string} zi Data `AAAA-LL-ZZ`, in ora Romaniei.
+ * @returns {Promise<object[]>}
+ */
+export async function getSloturi(id, zi) {
+  const { data } = await httpClient.get(`${RESOURCE}/${id}/sloturi`, {
+    params: { data: zi },
+  });
+  return data;
+}
+
+/**
  * POST /facilitati
  * @param {object} facilitate
  * @returns {Promise<object>}

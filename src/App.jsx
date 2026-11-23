@@ -7,6 +7,7 @@ import SesiuneProvider from './components/SesiuneProvider.jsx';
 import AdminFacilitatePage from './pages/Admin/AdminFacilitatePage.jsx';
 import AdminFacilitatiPage from './pages/Admin/AdminFacilitatiPage.jsx';
 import AutentificarePage from './pages/Autentificare/AutentificarePage.jsx';
+import FacilitatePage from './pages/Facilitati/FacilitatePage.jsx';
 import FacilitatiPage from './pages/Facilitati/FacilitatiPage.jsx';
 import InregistrarePage from './pages/Inregistrare/InregistrarePage.jsx';
 
@@ -23,6 +24,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/facilitati" replace />} />
               <Route path="/facilitati" element={<FacilitatiPage />} />
+              <Route path="/facilitati/:id" element={<FacilitatePage />} />
               <Route path="/inregistrare" element={<InregistrarePage />} />
               <Route path="/autentificare" element={<AutentificarePage />} />
               <Route element={<RutaProtejata />}>
