@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 import { ascultaEvenimentele } from '../api/evenimenteApi.js';
 import { createSloturi, getSloturi } from '../api/facilitatiApi.js';
+import { updateStareSlot } from '../api/sloturiApi.js';
 import { getDataRomania } from '../utils/oraRomania.js';
 
 export const SLOTURI_KEY = ['sloturi'];
@@ -80,5 +81,18 @@ export function useCreateSloturi(idFacilitate) {
   return useMutation({
     mutationFn: (program) => createSloturi(idFacilitate, program),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: SLOTURI_KEY }),
+  });
+}
+
+/**
+ * Schimba starea unui slot (`Mentenanta` sau `Liber`); primeste
+ * `{ idSlot, stare }`. Sloturile se reincarca oricum s-a terminat cererea.
+ * @returns {import('@tanstack/react-query').UseMutationResult<object>}
+ */
+export function useUpdateStareSlot() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ idSlot, stare }) => updateStareSlot(idSlot, stare),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: SLOTURI_KEY }),
   });
 }

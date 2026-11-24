@@ -91,6 +91,10 @@ describe('FacilitatePage', () => {
       expect.stringMatching(/09:00 – 10:00.*Ocupat/),
       expect.stringMatching(/10:00 – 11:00.*Mentenanță/),
     ]);
+    // Blocarea sloturilor e doar pe pagina de administrare.
+    expect(
+      screen.queryByRole('button', { name: /Blochează|Deblochează/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('arata ambele sloturi de la 03:00 din noaptea trecerii la ora de iarna', async () => {
