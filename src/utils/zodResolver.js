@@ -2,8 +2,9 @@ import { get, set } from 'react-hook-form';
 
 /**
  * Leaga o schema Zod de React Hook Form: intoarce datele validate sau prima
- * eroare pentru fiecare camp, inclusiv campurile imbricate. Inlocuieste pachetul `@hookform/resolvers`, ale
- * carui dependente optionale fac package-lock.json invalid pentru npm ci.
+ * eroare pentru fiecare camp, inclusiv pentru campurile imbricate. Inlocuieste
+ * pachetul `@hookform/resolvers`, ale carui dependente optionale fac
+ * package-lock.json invalid pentru npm ci.
  * @param {import('zod').ZodType} zodSchema
  * @returns {import('react-hook-form').Resolver}
  */

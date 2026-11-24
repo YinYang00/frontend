@@ -1,5 +1,5 @@
 // Hook-urile TanStack Query pentru regulile de acces ale unei facilitati.
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { getReguliAcces, updateReguliAcces } from '../api/reguliAccesApi.js';
 
@@ -22,16 +22,14 @@ export function useReguliAcces(idFacilitate) {
 }
 
 /**
- * Inlocuieste regulile de acces ale unei facilitati; primeste lista completa.
- * Dupa succes, regulile citite devin cele salvate, intoarse de server.
+ * Inlocuieste regulile de acces ale unei facilitati; primeste lista completa
+ * si intoarce regulile salvate. Nu le pune in cache: daca pagina s-a inchis
+ * intre timp, ar ramane acolo si la redeschidere nu s-ar mai cere regulile.
  * @param {number | string} idFacilitate
  * @returns {import('@tanstack/react-query').UseMutationResult<object[]>}
  */
 export function useUpdateReguliAcces(idFacilitate) {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (reguli) => updateReguliAcces(idFacilitate, reguli),
-    onSuccess: (salvate) =>
-      queryClient.setQueryData([...REGULI_ACCES_KEY, idFacilitate], salvate),
   });
 }

@@ -1,9 +1,8 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { Link, Route } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getFacilitate } from '../../api/facilitatiApi.js';
-import { creeazaQueryClient } from '../../api/queryClient.js';
 import { getReguliAcces, updateReguliAcces } from '../../api/reguliAccesApi.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 
@@ -187,6 +186,7 @@ describe('ReguliAcces', () => {
     ['orele sunt zero', ['0', '7', '1'], ORE, MESAJ_ORE],
     ['orele depasesc saptamana', ['169', '7', '1'], ORE, MESAJ_ORE],
     ['orele nu sunt intregi', ['2.5', '7', '1'], ORE, MESAJ_ORE],
+    ['orele sunt in alta scriere', ['1e1', '7', '1'], ORE, MESAJ_ORE],
     ['orele nu sunt numar', ['abc', '7', '1'], ORE, MESAJ_ORE],
     ['zilele sunt zero', ['6', '0', '1'], ZILE, MESAJ_ZILE],
     ['zilele depasesc 30', ['6', '31', '1'], ZILE, MESAJ_ZILE],
@@ -245,7 +245,7 @@ describe('ReguliAcces', () => {
 
   it('dupa salvare tabelul arata regulile intoarse de server', async () => {
     vi.mocked(updateReguliAcces).mockResolvedValue([REGULA_STUDENT]);
-    const user = await deschideRegulile([]);
+    const user = await deschideRegulile([REGULA_STUDENT]);
 
     await completeazaRand(user, 'Student', ['006', '7', '2']);
     await completeazaRand(user, 'Cadru didactic', [' ', '', '']);
@@ -296,15 +296,20 @@ describe('ReguliAcces', () => {
     expect(await screen.findByText('Se încarcă regulile…')).toBeInTheDocument();
   });
 
-  it('la redeschiderea paginii arata regulile de acum ale serverului', async () => {
-    const queryClient = creeazaQueryClient();
-    vi.mocked(getReguliAcces).mockResolvedValue([REGULA_STUDENT]);
-    const user = renderAplicatia('/admin/facilitati/7', RUTE, { queryClient });
-    await screen.findByRole('table', { name: 'Reguli de acces' });
+  it('la redeschiderea paginii cere din nou regulile, si dupa o salvare intarziata', async () => {
+    let raspunde;
+    vi.mocked(updateReguliAcces).mockReturnValue(
+      new Promise((resolve) => {
+        raspunde = resolve;
+      }),
+    );
+    const user = await deschideRegulile([REGULA_STUDENT]);
+    await salveaza(user);
 
     await user.click(
       screen.getByRole('link', { name: /Înapoi la administrare/ }),
     );
+    await act(async () => raspunde([REGULA_STUDENT]));
     vi.mocked(getReguliAcces).mockResolvedValue([REGULA_PERSONAL]);
     await user.click(screen.getByRole('link', { name: 'Bazin olimpic' }));
     await screen.findByRole('table', { name: 'Reguli de acces' });
