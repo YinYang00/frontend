@@ -9,6 +9,7 @@ import AdminFacilitatePage from './AdminFacilitatePage.jsx';
 
 vi.mock('../../api/facilitatiApi.js', () => ({
   getFacilitate: vi.fn(),
+  getSloturi: vi.fn(async () => []),
   createSloturi: vi.fn(),
 }));
 vi.mock('../../api/reguliAccesApi.js', () => ({

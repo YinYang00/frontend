@@ -6,6 +6,8 @@
  * @param {boolean} props.isPending True cat timp cererea este in curs.
  * @param {() => void} props.onConfirm
  * @param {() => void} props.onCancel
+ * @param {string} [props.textConfirmare] Textul butonului de confirmare.
+ * @param {string} [props.textInCurs] Textul lui cat timp cererea e in curs.
  */
 export default function ConfirmDialog({
   titlu,
@@ -13,6 +15,8 @@ export default function ConfirmDialog({
   isPending,
   onConfirm,
   onCancel,
+  textConfirmare = 'Șterge',
+  textInCurs = 'Se șterge…',
 }) {
   return (
     <div className="fixed inset-0 z-10 flex items-end justify-center bg-ink/40 p-4 sm:items-center">
@@ -39,7 +43,7 @@ export default function ConfirmDialog({
             disabled={isPending}
             onClick={onConfirm}
           >
-            {isPending ? 'Se șterge…' : 'Șterge'}
+            {isPending ? textInCurs : textConfirmare}
           </button>
         </div>
       </div>

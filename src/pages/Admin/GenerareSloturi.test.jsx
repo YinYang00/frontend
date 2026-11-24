@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { Route } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -9,6 +9,7 @@ import AdminFacilitatePage from './AdminFacilitatePage.jsx';
 
 vi.mock('../../api/facilitatiApi.js', () => ({
   getFacilitate: vi.fn(),
+  getSloturi: vi.fn(async () => []),
   createSloturi: vi.fn(),
 }));
 vi.mock('../../api/reguliAccesApi.js', () => ({
@@ -37,6 +38,10 @@ const BAZIN = {
 function slot(id) {
   return { id_slot: id, id_facilitate: 7, stare: 'Liber', locuri_libere: 30 };
 }
+
+// Mesajele se cauta in sectiune: calendarul de mentenanta are mesajele lui.
+const sectiune = () =>
+  within(screen.getByRole('region', { name: 'Generare sloturi' }));
 
 /**
  * Deschide pagina bazinului si asteapta sectiunea de generare.
@@ -98,7 +103,7 @@ describe('GenerareSloturi', () => {
     await completeaza(user, PROGRAM);
     await user.click(screen.getByRole('button', { name: 'Generează sloturi' }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
+    expect(await sectiune().findByRole('status')).toHaveTextContent(
       '3 sloturi create',
     );
     expect(createSloturi).toHaveBeenCalledWith('7', {
@@ -161,7 +166,7 @@ describe('GenerareSloturi', () => {
     await completeaza(user, PROGRAM);
     await user.click(screen.getByRole('button', { name: 'Generează sloturi' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
+    expect(await sectiune().findByRole('alert')).toHaveTextContent(
       'Nu se pot genera sloturi pentru o zi din trecut.',
     );
   });
@@ -173,7 +178,7 @@ describe('GenerareSloturi', () => {
     await completeaza(user, PROGRAM);
     await user.click(screen.getByRole('button', { name: 'Generează sloturi' }));
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
+    expect(await sectiune().findByRole('status')).toHaveTextContent(
       '0 sloturi create',
     );
   });
@@ -195,7 +200,7 @@ describe('GenerareSloturi', () => {
     const user = await deschideGenerarea();
     await completeaza(user, PROGRAM);
     await user.click(screen.getByRole('button', { name: 'Generează sloturi' }));
-    await screen.findByRole('status');
+    await sectiune().findByRole('status');
 
     await completeaza(user, { ...PROGRAM, durata: '0' });
     await user.click(screen.getByRole('button', { name: 'Generează sloturi' }));
@@ -203,6 +208,6 @@ describe('GenerareSloturi', () => {
     await screen.findByText(
       'Durata trebuie să fie un număr întreg pozitiv de minute.',
     );
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(sectiune().queryByRole('status')).not.toBeInTheDocument();
   });
 });

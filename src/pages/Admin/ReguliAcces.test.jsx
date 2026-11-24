@@ -10,6 +10,7 @@ import AdminFacilitatePage from './AdminFacilitatePage.jsx';
 
 vi.mock('../../api/facilitatiApi.js', () => ({
   getFacilitate: vi.fn(),
+  getSloturi: vi.fn(async () => []),
   createSloturi: vi.fn(),
 }));
 vi.mock('../../api/reguliAccesApi.js', () => ({
@@ -58,6 +59,10 @@ const REGULA_PERSONAL = {
   prioritate: 3,
   zile_avans_maxim: 14,
 };
+
+// Mesajele se cauta in sectiune: calendarul de mentenanta are mesajele lui.
+const sectiune = () =>
+  within(screen.getByRole('region', { name: 'Reguli de acces' }));
 
 /**
  * Deschide pagina bazinului.
@@ -161,7 +166,7 @@ describe('ReguliAcces', () => {
     await completeazaRand(user, 'Personal administrativ', ['', '', '']);
     await salveaza(user);
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
+    expect(await sectiune().findByRole('status')).toHaveTextContent(
       'Regulile au fost salvate.',
     );
     expect(updateReguliAcces).toHaveBeenCalledTimes(1);
@@ -178,7 +183,7 @@ describe('ReguliAcces', () => {
     await completeazaRand(user, 'Student', ['', '', '']);
     await salveaza(user);
 
-    await screen.findByRole('status');
+    await sectiune().findByRole('status');
     expect(updateReguliAcces).toHaveBeenCalledWith('7', []);
   });
 
@@ -224,7 +229,7 @@ describe('ReguliAcces', () => {
     await completeazaRand(user, 'Student', ['10', '14', '3']);
     await salveaza(user);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
+    expect(await sectiune().findByRole('alert')).toHaveTextContent(
       'Fiecare categorie poate avea o singura regula.',
     );
     expect(valoriRand('Student')).toEqual(['10', '14', '3']);
@@ -234,13 +239,13 @@ describe('ReguliAcces', () => {
     vi.mocked(updateReguliAcces).mockResolvedValue([REGULA_STUDENT]);
     const user = await deschideRegulile([REGULA_STUDENT]);
     await salveaza(user);
-    await screen.findByRole('status');
+    await sectiune().findByRole('status');
 
     await completeazaRand(user, 'Student', ['6', '7', '9']);
     await salveaza(user);
 
     await screen.findByText(MESAJ_PRIORITATE);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(sectiune().queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('dupa salvare tabelul arata regulile intoarse de server', async () => {
@@ -251,7 +256,7 @@ describe('ReguliAcces', () => {
     await completeazaRand(user, 'Cadru didactic', [' ', '', '']);
     await salveaza(user);
 
-    await screen.findByRole('status');
+    await sectiune().findByRole('status');
     expect(valoriRand('Student')).toEqual(['6', '7', '2']);
     expect(valoriRand('Cadru didactic')).toEqual(['', '', '']);
   });
