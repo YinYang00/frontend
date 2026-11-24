@@ -11,6 +11,9 @@ vi.mock('../../api/facilitatiApi.js', () => ({
   getFacilitate: vi.fn(),
   createSloturi: vi.fn(),
 }));
+vi.mock('../../api/reguliAccesApi.js', () => ({
+  getReguliAcces: vi.fn(async () => []),
+}));
 vi.mock('../../api/utilizatoriApi.js', () => ({ getProfil: vi.fn() }));
 
 // Sectiunea se testeaza pe pagina de administrare, unde o vede utilizatorul.

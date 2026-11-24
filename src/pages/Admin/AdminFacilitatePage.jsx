@@ -5,6 +5,7 @@ import StatusMessage from '../../components/StatusMessage.jsx';
 import { useFacilitate } from '../../hooks/useFacilitati.js';
 
 import GenerareSloturi from './GenerareSloturi.jsx';
+import ReguliAcces from './ReguliAcces.jsx';
 
 /**
  * Legatura inapoi la lista de administrare.
@@ -18,8 +19,8 @@ function LinkInapoi() {
 }
 
 /**
- * Pagina de administrare a unei facilitati. Tichetele de generare a
- * sloturilor, reguli de acces si mentenanta isi adauga aici sectiunile.
+ * Pagina de administrare a unei facilitati. Tichetul de mentenanta isi adauga
+ * aici sectiunea.
  */
 export default function AdminFacilitatePage() {
   const { id } = useParams();
@@ -52,8 +53,9 @@ export default function AdminFacilitatePage() {
           {facilitate.tip} · {facilitate.locatie}
         </p>
       </header>
-      {/* key: alta facilitate porneste cu formularul si rezultatul goale. */}
-      <GenerareSloturi key={id} idFacilitate={id} />
+      {/* key: alta facilitate porneste cu formularele si rezultatele goale. */}
+      <GenerareSloturi key={`generare-${id}`} idFacilitate={id} />
+      <ReguliAcces key={`reguli-${id}`} idFacilitate={id} />
     </section>
   );
 }
