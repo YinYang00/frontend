@@ -4,8 +4,9 @@ const FUS_ORAR = 'Europe/Bucharest';
 const LIMBA = 'ro-RO';
 const ZILE_IN_BANDA = 14;
 
-// Data de azi se citeste pe bucati (formatToParts), nu din textul formatat:
-// ordinea si separatorii datei depind de datele de localizare ale browserului.
+// Ziua unui moment se citeste pe bucati (formatToParts), nu din textul
+// formatat: ordinea si separatorii datei depind de datele de localizare ale
+// browserului.
 const FORMATTER_ZI_ROMANIA = new Intl.DateTimeFormat(LIMBA, {
   timeZone: FUS_ORAR,
   year: 'numeric',
@@ -58,12 +59,13 @@ export function formatOra(moment) {
 }
 
 /**
- * Anul, luna si ziua de azi, in ora Romaniei.
+ * Anul, luna si ziua unui moment, in ora Romaniei.
+ * @param {Date} moment
  * @returns {{an: number, luna: number, zi: number}}
  */
-function getPartiAzi() {
+function getPartiZi(moment) {
   const parti = Object.fromEntries(
-    FORMATTER_ZI_ROMANIA.formatToParts(new Date()).map(({ type, value }) => [
+    FORMATTER_ZI_ROMANIA.formatToParts(moment).map(({ type, value }) => [
       type,
       Number(value),
     ]),
@@ -72,12 +74,21 @@ function getPartiAzi() {
 }
 
 /**
+ * Data unui moment din API, in ora Romaniei.
+ * @param {string | Date} moment ISO 8601 sau `Date`.
+ * @returns {string} `AAAA-LL-ZZ`.
+ */
+export function getDataRomania(moment) {
+  const { an, luna, zi } = getPartiZi(new Date(moment));
+  return `${an}-${String(luna).padStart(2, '0')}-${String(zi).padStart(2, '0')}`;
+}
+
+/**
  * Data de azi, in ora Romaniei.
  * @returns {string} `AAAA-LL-ZZ`.
  */
 export function getAziRomania() {
-  const { an, luna, zi } = getPartiAzi();
-  return `${an}-${String(luna).padStart(2, '0')}-${String(zi).padStart(2, '0')}`;
+  return getDataRomania(new Date());
 }
 
 /**
@@ -87,7 +98,7 @@ export function getAziRomania() {
  *   „25 oct.”.
  */
 export function getZileBanda() {
-  const { an, luna, zi } = getPartiAzi();
+  const { an, luna, zi } = getPartiZi(new Date());
   return Array.from({ length: ZILE_IN_BANDA }, (_, index) => {
     const moment = new Date(Date.UTC(an, luna - 1, zi + index));
     return {

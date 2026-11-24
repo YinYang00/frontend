@@ -4,9 +4,11 @@ import { Link } from 'react-router';
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
 import { useCreateRezervare } from '../../hooks/useRezervari.js';
+import { useSlotLaZi } from '../../hooks/useSloturi.js';
 import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
 const HTTP_NOT_FOUND = 404;
+const MESAJ_OCUPAT = 'Slotul tocmai a fost ocupat';
 
 /**
  * Mesajul unei rezervari refuzate. Pentru slotul ocupat intre timp sau sters
@@ -16,7 +18,7 @@ const HTTP_NOT_FOUND = 404;
  */
 function getMesajRefuz(error) {
   if (error?.response?.data?.cod === 'SLOT_OCUPAT') {
-    return 'Slotul tocmai a fost ocupat';
+    return MESAJ_OCUPAT;
   }
   if (error?.response?.status === HTTP_NOT_FOUND) {
     return 'Slotul nu mai există';
@@ -46,17 +48,19 @@ function DetaliiSlot({ facilitate, slot }) {
 }
 
 /**
- * Refuzul sau confirmarea rezervarii, cu link spre detaliile ei.
+ * Refuzul sau confirmarea rezervarii, cu link spre detaliile ei, si anuntul
+ * ca slotul nu se mai poate rezerva.
  * @param {object} props
  * @param {import('@tanstack/react-query').UseMutationResult} props.rezervare
+ * @param {boolean} props.isOcupat
  */
-function RezultatRezervare({ rezervare }) {
+function RezultatRezervare({ rezervare, isOcupat }) {
+  const refuz = rezervare.isError ? getMesajRefuz(rezervare.error) : null;
   return (
     <div className="mt-4 flex flex-col gap-3">
-      {rezervare.isError && (
-        <StatusMessage varianta="eroare">
-          {getMesajRefuz(rezervare.error)}
-        </StatusMessage>
+      {refuz && <StatusMessage varianta="eroare">{refuz}</StatusMessage>}
+      {isOcupat && refuz !== MESAJ_OCUPAT && (
+        <StatusMessage varianta="eroare">{MESAJ_OCUPAT}</StatusMessage>
       )}
       {rezervare.isSuccess && (
         <>
@@ -84,6 +88,12 @@ function RezultatRezervare({ rezervare }) {
  */
 export default function RezervareDialog({ facilitate, slot, onInchide }) {
   const rezervare = useCreateRezervare();
+  const slotLaZi = useSlotLaZi(slot);
+  // Un slot in mentenanta e anuntat la fel: si serverul il refuza cu
+  // SLOT_OCUPAT. Cat cererea e in curs si dupa succes, ultimul loc poate fi
+  // chiar al utilizatorului.
+  const isOcupat =
+    !rezervare.isPending && !rezervare.isSuccess && slotLaZi.stare !== 'Liber';
   const refInchide = useRef(null);
   // Cat cererea e in curs dialogul ramane deschis: altfel utilizatorul n-ar
   // afla daca rezervarea s-a facut.
@@ -124,7 +134,7 @@ export default function RezervareDialog({ facilitate, slot, onInchide }) {
           Rezervă slotul
         </h2>
         <DetaliiSlot facilitate={facilitate} slot={slot} />
-        <RezultatRezervare rezervare={rezervare} />
+        <RezultatRezervare rezervare={rezervare} isOcupat={isOcupat} />
         <div className="mt-6 flex justify-end gap-3">
           <button
             ref={refInchide}
@@ -138,7 +148,7 @@ export default function RezervareDialog({ facilitate, slot, onInchide }) {
             <button
               type="button"
               className="btn btn-primar"
-              disabled={rezervare.isPending}
+              disabled={rezervare.isPending || isOcupat}
               onClick={() => rezervare.mutate(slot.id_slot)}
             >
               {rezervare.isPending ? 'Se rezervă…' : 'Rezervă locul'}
