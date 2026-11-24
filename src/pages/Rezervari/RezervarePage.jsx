@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
-import { useAnulareRezervare, useRezervare } from '../../hooks/useRezervari.js';
+import { useCancelRezervare, useRezervare } from '../../hooks/useRezervari.js';
 import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
 import AnulareDialog from './AnulareDialog.jsx';
@@ -72,10 +72,10 @@ export default function RezervarePage() {
   } = useRezervare(id, {
     enabled: idValid,
   });
-  // Ora se citeste o data, la deschiderea paginii, ca in lista rezervarilor.
-  const [acum] = useState(Date.now);
-  const anulare = useAnulareRezervare();
-  const [confirmare, setConfirmare] = useState(false);
+  // Ora se citeste la deschidere si dupa anulare, ca in lista rezervarilor.
+  const [acum, setAcum] = useState(Date.now);
+  const anulare = useCancelRezervare();
+  const [showConfirmare, setShowConfirmare] = useState(false);
 
   if (!idValid) {
     return <EroareRezervare mesaj={MESAJ_NEGASITA} />;
@@ -126,19 +126,19 @@ export default function RezervarePage() {
           type="button"
           className="btn btn-secundar self-start"
           disabled={anulare.isPending}
-          onClick={() => {
-            anulare.reset();
-            setConfirmare(true);
-          }}
+          onClick={() => setShowConfirmare(true)}
         >
           Anulează
         </button>
       )}
-      {confirmare && (
+      {showConfirmare && (
         <AnulareDialog
           rezervare={rezervare}
           anulare={anulare}
-          onInchide={() => setConfirmare(false)}
+          onInchide={() => {
+            setShowConfirmare(false);
+            setAcum(Date.now());
+          }}
         />
       )}
     </section>

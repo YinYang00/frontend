@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { salveazaToken } from '../../api/httpClient.js';
 import { creeazaQueryClient } from '../../api/queryClient.js';
-import { anuleazaRezervare, getRezervare } from '../../api/rezervariApi.js';
+import { cancelRezervare, getRezervare } from '../../api/rezervariApi.js';
 import { getProfil } from '../../api/utilizatoriApi.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 
@@ -12,7 +12,7 @@ import RezervarePage from './RezervarePage.jsx';
 
 vi.mock('../../api/rezervariApi.js', () => ({
   getRezervare: vi.fn(),
-  anuleazaRezervare: vi.fn(),
+  cancelRezervare: vi.fn(),
 }));
 vi.mock('../../api/utilizatoriApi.js', () => ({ getProfil: vi.fn() }));
 
@@ -71,7 +71,7 @@ describe('RezervarePage', () => {
     salveazaToken('token-ana');
     vi.mocked(getProfil).mockResolvedValue(ANA);
     vi.mocked(getRezervare).mockReset();
-    vi.mocked(anuleazaRezervare).mockReset();
+    vi.mocked(cancelRezervare).mockReset();
   });
 
   afterEach(() => {
@@ -173,7 +173,7 @@ describe('RezervarePage', () => {
     vi.mocked(getRezervare)
       .mockResolvedValueOnce(REZERVARE)
       .mockResolvedValue({ ...REZERVARE, stare_rezervare: 'Anulata' });
-    vi.mocked(anuleazaRezervare).mockResolvedValue({
+    vi.mocked(cancelRezervare).mockResolvedValue({
       ...REZERVARE,
       stare_rezervare: 'Anulata',
     });
@@ -187,7 +187,7 @@ describe('RezervarePage', () => {
       }),
     );
 
-    expect(anuleazaRezervare).toHaveBeenCalledWith(7);
+    expect(cancelRezervare).toHaveBeenCalledWith(7);
     expect(await screen.findByText('Anulată')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Anulează' }),

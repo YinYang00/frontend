@@ -36,7 +36,7 @@ export async function getRezervare(idRezervare) {
  * @param {number} idRezervare
  * @returns {Promise<object>} Rezervarea, in starea `Anulata`.
  */
-export async function anuleazaRezervare(idRezervare) {
+export async function cancelRezervare(idRezervare) {
   const { data } = await httpClient.post(`/rezervari/${idRezervare}/anulare`);
   return data;
 }

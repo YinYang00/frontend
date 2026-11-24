@@ -7,7 +7,7 @@ import { formatOra, formatZi } from '../../utils/oraRomania.js';
  * @param {object} props
  * @param {object} props.rezervare
  * @param {import('@tanstack/react-query').UseMutationResult} props.anulare
- *   Rezultatul lui useAnulareRezervare.
+ *   Rezultatul lui useCancelRezervare.
  * @param {() => void} props.onInchide
  */
 export default function AnulareDialog({ rezervare, anulare, onInchide }) {

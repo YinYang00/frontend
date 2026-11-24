@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
-import { useAnulareRezervare, useRezervari } from '../../hooks/useRezervari.js';
+import { useCancelRezervare, useRezervari } from '../../hooks/useRezervari.js';
 import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
 import AnulareDialog from './AnulareDialog.jsx';
@@ -105,16 +105,12 @@ function ListaRezervari() {
     error,
     refetch,
   } = useRezervari();
-  // shortcut: ora se citeste o data, la deschiderea paginii; o pagina lasata
-  // deschisa nu muta singura rezervarile in Istoric (s-ar putea cu un interval).
-  const [acum] = useState(Date.now);
-  const anulare = useAnulareRezervare();
+  // shortcut: ora se citeste la deschiderea paginii si dupa fiecare anulare; o
+  // pagina lasata deschisa nu muta singura rezervarile in Istoric (s-ar putea
+  // cu un interval).
+  const [acum, setAcum] = useState(Date.now);
+  const anulare = useCancelRezervare();
   const [deAnulat, setDeAnulat] = useState(null);
-
-  const handleAnuleaza = (rezervare) => {
-    anulare.reset();
-    setDeAnulat(rezervare);
-  };
 
   if (isPending) {
     return (
@@ -156,7 +152,7 @@ function ListaRezervari() {
 
   const sectiune = {
     acum,
-    onAnuleaza: handleAnuleaza,
+    onAnuleaza: setDeAnulat,
     isPending: anulare.isPending,
   };
   return (
@@ -172,7 +168,10 @@ function ListaRezervari() {
         <AnulareDialog
           rezervare={deAnulat}
           anulare={anulare}
-          onInchide={() => setDeAnulat(null)}
+          onInchide={() => {
+            setDeAnulat(null);
+            setAcum(Date.now());
+          }}
         />
       )}
     </>

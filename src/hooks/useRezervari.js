@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
-  anuleazaRezervare,
+  cancelRezervare,
   createRezervare,
   getRezervare,
   getRezervari,
@@ -55,10 +55,10 @@ export function useCreateRezervare() {
  * nu mai fie cea reala.
  * @returns {import('@tanstack/react-query').UseMutationResult}
  */
-export function useAnulareRezervare() {
+export function useCancelRezervare() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (idRezervare) => anuleazaRezervare(idRezervare),
+    mutationFn: (idRezervare) => cancelRezervare(idRezervare),
     onSettled: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: REZERVARI_KEY }),
