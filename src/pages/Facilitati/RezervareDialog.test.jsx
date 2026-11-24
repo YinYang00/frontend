@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { Route } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,6 +7,7 @@ import { getFacilitate, getSloturi } from '../../api/facilitatiApi.js';
 import { salveazaToken } from '../../api/httpClient.js';
 import { createRezervare } from '../../api/rezervariApi.js';
 import { getProfil } from '../../api/utilizatoriApi.js';
+import { emiteSlotActualizat } from '../../test/eventSourceFals.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 import AutentificarePage from '../Autentificare/AutentificarePage.jsx';
 
@@ -68,6 +69,17 @@ async function deschideDialogul() {
   const user = renderAplicatia('/facilitati/7', RUTE);
   await user.click(await screen.findByRole('button', { name: /Rezervă/ }));
   return user;
+}
+
+/**
+ * Altcineva schimba slotul: serverul il intoarce altfel si anunta calendarul.
+ * @param {object} schimbari `stare` si `locuri_libere`.
+ */
+function schimbaSlotul(schimbari) {
+  vi.mocked(getSloturi).mockResolvedValue([{ ...SLOT_LIBER, ...schimbari }]);
+  act(() =>
+    emiteSlotActualizat({ id_slot: 41, id_facilitate: 7, ...schimbari }),
+  );
 }
 
 describe('Rezervarea unui slot', () => {
@@ -209,5 +221,69 @@ describe('Rezervarea unui slot', () => {
     );
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['Ocupat', 0],
+    // Serverul refuza si un slot in mentenanta tot cu SLOT_OCUPAT.
+    ['Mentenanta', 1],
+  ])(
+    'opreste rezervarea cand slotul deschis devine %s',
+    async (stare, locuri) => {
+      await deschideDialogul();
+      const dialog = screen.getByRole('dialog', { name: 'Rezervă slotul' });
+
+      schimbaSlotul({ stare, locuri_libere: locuri });
+
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+        'Slotul tocmai a fost ocupat',
+      );
+      expect(
+        within(dialog).getByRole('button', { name: 'Rezervă locul' }),
+      ).toBeDisabled();
+    },
+  );
+
+  it('nu anunta slotul ocupat cand ultimul loc l-a luat chiar utilizatorul', async () => {
+    let confirmaRezervarea;
+    vi.mocked(createRezervare).mockReturnValue(
+      new Promise((resolve) => {
+        confirmaRezervarea = () => resolve({ id_rezervare: 55 });
+      }),
+    );
+    const user = await deschideDialogul();
+    const dialog = screen.getByRole('dialog', { name: 'Rezervă slotul' });
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Rezervă locul' }),
+    );
+
+    // Evenimentul poate ajunge inaintea raspunsului la rezervare.
+    schimbaSlotul({ stare: 'Ocupat', locuri_libere: 0 });
+    expect(await screen.findByText('Ocupat')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+
+    await act(async () => confirmaRezervarea());
+    expect(
+      await within(dialog).findByText('Rezervare confirmată'),
+    ).toBeVisible();
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('spune o singura data ca slotul e ocupat dupa un refuz SLOT_OCUPAT', async () => {
+    vi.mocked(createRezervare).mockRejectedValue({
+      response: { status: 409, data: { cod: 'SLOT_OCUPAT', mesaj: 'Alt' } },
+    });
+    const user = await deschideDialogul();
+    vi.mocked(getSloturi).mockResolvedValue([
+      { ...SLOT_LIBER, stare: 'Ocupat', locuri_libere: 0 },
+    ]);
+
+    await user.click(screen.getByRole('button', { name: 'Rezervă locul' }));
+
+    expect(await screen.findByText('Ocupat')).toBeInTheDocument();
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(
+      screen.getByRole('button', { name: 'Rezervă locul' }),
+    ).toBeDisabled();
   });
 });

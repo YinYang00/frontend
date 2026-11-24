@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
-import { useSloturi } from '../../hooks/useSloturi.js';
+import { useSloturi, useSloturiInTimpReal } from '../../hooks/useSloturi.js';
 import { getZileBanda } from '../../utils/oraRomania.js';
 
 import SloturiList from './SloturiList.jsx';
@@ -64,6 +64,7 @@ export default function CalendarSloturi({ facilitate, renderActiune }) {
     ? ziDinAdresa
     : zile[0].data;
   const handleAlege = (zi) => setParametri({ zi }, { replace: true });
+  useSloturiInTimpReal(facilitate.id_facilitate);
 
   return (
     <section aria-label="Calendarul sloturilor" className="flex flex-col gap-4">
