@@ -2,16 +2,10 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router';
 
 import { useSesiune } from '../hooks/useSesiune.js';
+import { CATEGORII } from '../utils/categorii.js';
 
 import Icon from './Icon.jsx';
 import UsvLogo from './UsvLogo.jsx';
-
-// Categoriile din API, asa cum se afiseaza (vezi GLOSSARY.md, Categorie).
-const CATEGORII = {
-  Student: 'Student',
-  CadruDidactic: 'Cadru didactic',
-  PersonalAdministrativ: 'Personal administrativ',
-};
 
 // Guest nu e un rol (GLOSSARY.md), dar meniul il trateaza la fel: cine vede
 // fiecare element.
