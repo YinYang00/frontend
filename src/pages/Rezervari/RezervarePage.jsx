@@ -3,10 +3,11 @@ import { Link, useParams } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
-import { useRezervare } from '../../hooks/useRezervari.js';
+import { useAnulareRezervare, useRezervare } from '../../hooks/useRezervari.js';
 import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
-import { getEticheta } from './etichetaRezervare.js';
+import AnulareDialog from './AnulareDialog.jsx';
+import { getEticheta, isAnulabila } from './etichetaRezervare.js';
 
 const HTTP_NOT_FOUND = 404;
 
@@ -57,7 +58,8 @@ function Detaliu({ termen, children }) {
 
 /**
  * Pagina detaliilor unei rezervari, doar pentru utilizatorii autentificati:
- * facilitatea, ziua, intervalul, eticheta si codul rezervarii.
+ * facilitatea, ziua, intervalul, eticheta si codul rezervarii, plus
+ * "Anuleaza" cat timp rezervarea e activa si slotul nu a inceput.
  */
 export default function RezervarePage() {
   const { id } = useParams();
@@ -72,6 +74,8 @@ export default function RezervarePage() {
   });
   // Ora se citeste o data, la deschiderea paginii, ca in lista rezervarilor.
   const [acum] = useState(Date.now);
+  const anulare = useAnulareRezervare();
+  const [confirmare, setConfirmare] = useState(false);
 
   if (!idValid) {
     return <EroareRezervare mesaj={MESAJ_NEGASITA} />;
@@ -112,6 +116,31 @@ export default function RezervarePage() {
           <span className="font-mono break-all">{rezervare.cod_qr}</span>
         </Detaliu>
       </dl>
+      {anulare.isError && (
+        <StatusMessage varianta="eroare">
+          {getErrorMessage(anulare.error)}
+        </StatusMessage>
+      )}
+      {isAnulabila(rezervare, acum) && (
+        <button
+          type="button"
+          className="btn btn-secundar self-start"
+          disabled={anulare.isPending}
+          onClick={() => {
+            anulare.reset();
+            setConfirmare(true);
+          }}
+        >
+          Anulează
+        </button>
+      )}
+      {confirmare && (
+        <AnulareDialog
+          rezervare={rezervare}
+          anulare={anulare}
+          onInchide={() => setConfirmare(false)}
+        />
+      )}
     </section>
   );
 }

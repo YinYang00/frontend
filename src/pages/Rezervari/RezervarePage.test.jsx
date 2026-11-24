@@ -1,16 +1,19 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { Route } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { salveazaToken } from '../../api/httpClient.js';
 import { creeazaQueryClient } from '../../api/queryClient.js';
-import { getRezervare } from '../../api/rezervariApi.js';
+import { anuleazaRezervare, getRezervare } from '../../api/rezervariApi.js';
 import { getProfil } from '../../api/utilizatoriApi.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 
 import RezervarePage from './RezervarePage.jsx';
 
-vi.mock('../../api/rezervariApi.js', () => ({ getRezervare: vi.fn() }));
+vi.mock('../../api/rezervariApi.js', () => ({
+  getRezervare: vi.fn(),
+  anuleazaRezervare: vi.fn(),
+}));
 vi.mock('../../api/utilizatoriApi.js', () => ({ getProfil: vi.fn() }));
 
 const ACUM = new Date('2026-11-20T12:00:00+02:00');
@@ -68,6 +71,7 @@ describe('RezervarePage', () => {
     salveazaToken('token-ana');
     vi.mocked(getProfil).mockResolvedValue(ANA);
     vi.mocked(getRezervare).mockReset();
+    vi.mocked(anuleazaRezervare).mockReset();
   });
 
   afterEach(() => {
@@ -164,4 +168,47 @@ describe('RezervarePage', () => {
       expect(getRezervare).not.toHaveBeenCalled();
     },
   );
+
+  it('anuleaza rezervarea dupa confirmare, apoi o arata Anulata', async () => {
+    vi.mocked(getRezervare)
+      .mockResolvedValueOnce(REZERVARE)
+      .mockResolvedValue({ ...REZERVARE, stare_rezervare: 'Anulata' });
+    vi.mocked(anuleazaRezervare).mockResolvedValue({
+      ...REZERVARE,
+      stare_rezervare: 'Anulata',
+    });
+
+    const user = renderAplicatia('/rezervari/7', RUTE);
+
+    await user.click(await screen.findByRole('button', { name: 'Anulează' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Anulează',
+      }),
+    );
+
+    expect(anuleazaRezervare).toHaveBeenCalledWith(7);
+    expect(await screen.findByText('Anulată')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Anulează' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('nu arata Anuleaza cand slotul a inceput', async () => {
+    vi.mocked(getRezervare).mockResolvedValue({
+      ...REZERVARE,
+      slot: {
+        ...REZERVARE.slot,
+        ora_inceput: '2026-11-20T11:30:00+02:00',
+        ora_sfarsit: '2026-11-20T12:30:00+02:00',
+      },
+    });
+
+    renderAplicatia('/rezervari/7', RUTE);
+
+    expect(await screen.findByText('În desfășurare')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Anulează' }),
+    ).not.toBeInTheDocument();
+  });
 });

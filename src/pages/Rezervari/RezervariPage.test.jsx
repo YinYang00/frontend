@@ -3,13 +3,16 @@ import { Route } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { salveazaToken } from '../../api/httpClient.js';
-import { getRezervari } from '../../api/rezervariApi.js';
+import { anuleazaRezervare, getRezervari } from '../../api/rezervariApi.js';
 import { getProfil } from '../../api/utilizatoriApi.js';
 import { renderAplicatia } from '../../test/renderAplicatia.jsx';
 
 import RezervariPage from './RezervariPage.jsx';
 
-vi.mock('../../api/rezervariApi.js', () => ({ getRezervari: vi.fn() }));
+vi.mock('../../api/rezervariApi.js', () => ({
+  getRezervari: vi.fn(),
+  anuleazaRezervare: vi.fn(),
+}));
 vi.mock('../../api/utilizatoriApi.js', () => ({ getProfil: vi.fn() }));
 
 const ACUM = new Date('2026-11-20T12:00:00+02:00');
@@ -67,6 +70,7 @@ describe('RezervariPage', () => {
     salveazaToken('token-ana');
     vi.mocked(getProfil).mockResolvedValue(ANA);
     vi.mocked(getRezervari).mockReset();
+    vi.mocked(anuleazaRezervare).mockReset();
   });
 
   afterEach(() => {
@@ -140,5 +144,93 @@ describe('RezervariPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Serverul nu răspunde',
     );
+  });
+  it('anuleaza doar rezervarile active neincepute, dupa confirmare', async () => {
+    const tenis = rezervare(
+      1,
+      'Confirmata',
+      '2026-11-25T10:00:00+02:00',
+      'Teren tenis',
+    );
+    vi.mocked(getRezervari)
+      .mockResolvedValueOnce([
+        tenis,
+        rezervare(
+          4,
+          'PrezentaConfirmata',
+          '2026-11-20T11:30:00+02:00',
+          'Sala box',
+        ),
+        rezervare(3, 'Anulata', '2026-11-22T10:00:00+02:00', 'Bazin'),
+      ])
+      .mockResolvedValue([{ ...tenis, stare_rezervare: 'Anulata' }]);
+    vi.mocked(anuleazaRezervare).mockResolvedValue({
+      ...tenis,
+      stare_rezervare: 'Anulata',
+    });
+
+    const user = renderAplicatia('/rezervari', RUTE);
+
+    const butoane = await screen.findAllByRole('button', { name: /Anulează/ });
+    expect(butoane).toHaveLength(1);
+    expect(butoane[0]).toHaveAccessibleName(/Teren tenis/);
+
+    await user.click(butoane[0]);
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Anulează',
+      }),
+    );
+
+    expect(anuleazaRezervare).toHaveBeenCalledWith(1);
+    await screen.findByRole('region', { name: 'Istoric' });
+    expect(getRanduri('Istoric')[0]).toMatch(/Teren tenis.*Anulată/);
+    expect(
+      screen.queryByRole('region', { name: 'Viitoare' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('renuntarea in dialog nu trimite nicio cerere', async () => {
+    vi.mocked(getRezervari).mockResolvedValue([
+      rezervare(1, 'Confirmata', '2026-11-25T10:00:00+02:00', 'Teren tenis'),
+    ]);
+
+    const user = renderAplicatia('/rezervari', RUTE);
+
+    await user.click(await screen.findByRole('button', { name: /Anulează/ }));
+    await user.click(screen.getByRole('button', { name: 'Renunță' }));
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(anuleazaRezervare).not.toHaveBeenCalled();
+  });
+
+  it('la 409 arata mesajul serverului si reincarca lista', async () => {
+    vi.mocked(getRezervari).mockResolvedValue([
+      rezervare(1, 'Confirmata', '2026-11-25T10:00:00+02:00', 'Teren tenis'),
+    ]);
+    vi.mocked(anuleazaRezervare).mockRejectedValue({
+      response: {
+        status: 409,
+        data: {
+          cod: 'ANULARE_TARZIE',
+          mesaj: 'Rezervarea nu se mai poate anula: slotul a inceput deja.',
+        },
+      },
+    });
+
+    const user = renderAplicatia('/rezervari', RUTE);
+
+    await user.click(await screen.findByRole('button', { name: /Anulează/ }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Anulează',
+      }),
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'slotul a inceput deja',
+    );
+    expect(getRezervari).toHaveBeenCalledTimes(2);
   });
 });

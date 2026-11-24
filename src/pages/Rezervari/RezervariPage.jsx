@@ -3,18 +3,22 @@ import { Link } from 'react-router';
 
 import { getErrorMessage } from '../../api/httpClient.js';
 import StatusMessage from '../../components/StatusMessage.jsx';
-import { useRezervari } from '../../hooks/useRezervari.js';
+import { useAnulareRezervare, useRezervari } from '../../hooks/useRezervari.js';
 import { formatOra, formatZi } from '../../utils/oraRomania.js';
 
-import { getEticheta, isViitoare } from './etichetaRezervare.js';
+import AnulareDialog from './AnulareDialog.jsx';
+import { getEticheta, isAnulabila, isViitoare } from './etichetaRezervare.js';
 
 /**
- * O rezervare din lista: facilitatea, ziua, intervalul si eticheta.
+ * O rezervare din lista: facilitatea, ziua, intervalul, eticheta si,
+ * daca se mai poate anula, butonul "Anuleaza".
  * @param {object} props
  * @param {object} props.rezervare
  * @param {string} props.eticheta
+ * @param {(() => void) | null} props.onAnuleaza Lipseste cand nu se poate anula.
+ * @param {boolean} props.isPending True cat timp o anulare e in curs.
  */
-function RezervareItem({ rezervare, eticheta }) {
+function RezervareItem({ rezervare, eticheta, onAnuleaza, isPending }) {
   const { id_rezervare: id, slot, facilitate } = rezervare;
   return (
     <li className="card flex flex-wrap items-center justify-between gap-3 p-4">
@@ -32,9 +36,22 @@ function RezervareItem({ rezervare, eticheta }) {
           </span>
         </span>
       </div>
-      <span className="rounded-md bg-placeholder px-2 py-0.5 text-xs font-medium text-muted">
-        {eticheta}
-      </span>
+      <div className="flex items-center gap-3">
+        <span className="rounded-md bg-placeholder px-2 py-0.5 text-xs font-medium text-muted">
+          {eticheta}
+        </span>
+        {onAnuleaza && (
+          <button
+            type="button"
+            className="btn btn-secundar"
+            aria-label={`Anulează ${facilitate.denumire}, ${formatZi(slot.ora_inceput)}, ${formatOra(slot.ora_inceput)}`}
+            disabled={isPending}
+            onClick={onAnuleaza}
+          >
+            Anulează
+          </button>
+        )}
+      </div>
     </li>
   );
 }
@@ -45,8 +62,10 @@ function RezervareItem({ rezervare, eticheta }) {
  * @param {string} props.titlu
  * @param {object[]} props.rezervari
  * @param {number} props.acum
+ * @param {(rezervare: object) => void} props.onAnuleaza
+ * @param {boolean} props.isPending
  */
-function SectiuneRezervari({ titlu, rezervari, acum }) {
+function SectiuneRezervari({ titlu, rezervari, acum, onAnuleaza, isPending }) {
   const idTitlu = useId();
   if (rezervari.length === 0) {
     return null;
@@ -62,6 +81,10 @@ function SectiuneRezervari({ titlu, rezervari, acum }) {
             key={rezervare.id_rezervare}
             rezervare={rezervare}
             eticheta={getEticheta(rezervare, acum)}
+            onAnuleaza={
+              isAnulabila(rezervare, acum) ? () => onAnuleaza(rezervare) : null
+            }
+            isPending={isPending}
           />
         ))}
       </ul>
@@ -85,6 +108,13 @@ function ListaRezervari() {
   // shortcut: ora se citeste o data, la deschiderea paginii; o pagina lasata
   // deschisa nu muta singura rezervarile in Istoric (s-ar putea cu un interval).
   const [acum] = useState(Date.now);
+  const anulare = useAnulareRezervare();
+  const [deAnulat, setDeAnulat] = useState(null);
+
+  const handleAnuleaza = (rezervare) => {
+    anulare.reset();
+    setDeAnulat(rezervare);
+  };
 
   if (isPending) {
     return (
@@ -124,10 +154,27 @@ function ListaRezervari() {
     .filter((rezervare) => !isViitoare(rezervare, acum))
     .sort((prima, aDoua) => inceput(aDoua) - inceput(prima));
 
+  const sectiune = {
+    acum,
+    onAnuleaza: handleAnuleaza,
+    isPending: anulare.isPending,
+  };
   return (
     <>
-      <SectiuneRezervari titlu="Viitoare" rezervari={viitoare} acum={acum} />
-      <SectiuneRezervari titlu="Istoric" rezervari={istoric} acum={acum} />
+      {anulare.isError && (
+        <StatusMessage varianta="eroare">
+          {getErrorMessage(anulare.error)}
+        </StatusMessage>
+      )}
+      <SectiuneRezervari titlu="Viitoare" rezervari={viitoare} {...sectiune} />
+      <SectiuneRezervari titlu="Istoric" rezervari={istoric} {...sectiune} />
+      {deAnulat && (
+        <AnulareDialog
+          rezervare={deAnulat}
+          anulare={anulare}
+          onInchide={() => setDeAnulat(null)}
+        />
+      )}
     </>
   );
 }

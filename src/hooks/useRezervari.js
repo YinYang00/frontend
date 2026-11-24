@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
+  anuleazaRezervare,
   createRezervare,
   getRezervare,
   getRezervari,
@@ -45,5 +46,23 @@ export function useCreateRezervare() {
   return useMutation({
     mutationFn: createRezervare,
     onSettled: () => queryClient.invalidateQueries({ queryKey: SLOTURI_KEY }),
+  });
+}
+
+/**
+ * Anuleaza o rezervare; primeste `id_rezervare`. Rezervarile si sloturile se
+ * reincarca si dupa succes, si dupa refuz (409): starea afisata s-ar putea sa
+ * nu mai fie cea reala.
+ * @returns {import('@tanstack/react-query').UseMutationResult}
+ */
+export function useAnulareRezervare() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (idRezervare) => anuleazaRezervare(idRezervare),
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: REZERVARI_KEY }),
+        queryClient.invalidateQueries({ queryKey: SLOTURI_KEY }),
+      ]),
   });
 }

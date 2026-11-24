@@ -24,6 +24,19 @@ export function isViitoare(rezervare, acum) {
 }
 
 /**
+ * Daca rezervarea se mai poate anula: e activa si slotul ei nu a inceput.
+ * @param {object} rezervare
+ * @param {number} acum Momentul de acum, in milisecunde.
+ * @returns {boolean}
+ */
+export function isAnulabila(rezervare, acum) {
+  return (
+    STARI_ACTIVE.includes(rezervare.stare_rezervare) &&
+    acum < Date.parse(rezervare.slot.ora_inceput)
+  );
+}
+
+/**
  * Eticheta unei rezervari. La o rezervare activa, "In desfasurare" si
  * "Finalizata" se deduc din ora slotului; nu sunt stari.
  * @param {object} rezervare
