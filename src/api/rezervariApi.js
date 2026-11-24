@@ -30,3 +30,13 @@ export async function getRezervare(idRezervare) {
   const { data } = await httpClient.get(`/rezervari/${idRezervare}`);
   return data;
 }
+
+/**
+ * POST /rezervari/{id_rezervare}/anulare
+ * @param {number} idRezervare
+ * @returns {Promise<object>} Rezervarea, in starea `Anulata`.
+ */
+export async function cancelRezervare(idRezervare) {
+  const { data } = await httpClient.post(`/rezervari/${idRezervare}/anulare`);
+  return data;
+}
